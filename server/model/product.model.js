@@ -27,6 +27,18 @@ const productSchema = new mongoose.Schema(
       default: "",
     },
 
+    image: {
+      type: String,
+      default: "",
+    },
+
+    images: [
+      {
+        type: String,
+        default: "",
+      },
+    ],
+
     quantityStock: {
       //Tồn kho
       type: Number,
