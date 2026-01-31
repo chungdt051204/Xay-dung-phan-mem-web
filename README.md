@@ -1,8 +1,8 @@
 <h1>Xây dựng phần mềm web</h1>
 
-<hr>
-<img src="https://media2.dev.to/dynamic/image/width=1000,height=420,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2F17odd4fk8bnq8oagf05w.png" alt="" width="300" />
+<img src="https://d1fn6xu754v319.cloudfront.net/MERN_Title_image_f86d24f764.png" alt="" />
 
+<hr>
 <h3>Tasks</h3>
 <table>
     <thead>
