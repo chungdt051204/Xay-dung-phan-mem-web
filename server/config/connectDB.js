@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const connectDB = async () => {
   try {
     await mongoose.connect(
-      "mongodb+srv://<db_username>:<db_password>@cluster0.cczme0l.mongodb.net/nhom4?appName=Cluster0"
+      process.env.DATABASE_URI
     );
     console.log("Kết nối thành công");
   } catch (error) {
