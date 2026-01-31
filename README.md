@@ -1,6 +1,6 @@
 <h1>Xây dựng phần mềm web</h1>
 
-<img src="https://d1fn6xu754v319.cloudfront.net/MERN_Title_image_f86d24f764.png" alt="" />
+<img src="https://miro.medium.com/1*OUCRCkZjJ_85PFH2FZt3lg.jpeg" alt="" />
 
 <hr>
 <h3>Tasks</h3>
