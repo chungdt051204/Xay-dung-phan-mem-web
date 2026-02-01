@@ -3,13 +3,17 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const port = 3000;
-const categoryRouter = require("./modules/category/category.router");
+const cors = require("cors");
 connectDB();
-
-app.use("/", categoryRouter);
-app.get("/", (req, res) => {
-  return res.json("Hello world");
-});
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+const userRouter = require("./modules/user/user.router");
+app.use(express.json());
+app.use("/", userRouter);
 app.listen(port, () => {
   console.log("Server đang chạy với port:" + port);
 });
