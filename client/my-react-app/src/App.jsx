@@ -3,6 +3,7 @@ import AppContext from "./assets/components/AppContext";
 import HomeUser from "./assets/components/HomeUser";
 import Login from "./assets/components/Login";
 import { useEffect, useState } from "react";
+import Register from "./assets/components/Register";
 export const api = "http://localhost:3000";
 // import "./App.css";
 
@@ -37,6 +38,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomeUser />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </AppContext.Provider>
     </>
