@@ -65,7 +65,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} Ashion. Bảo lưu mọi quyền.</p>
+        <p>&copy; {new Date().getFullYear()} Nhóm4. Bảo lưu mọi quyền.</p>
       </div>
     </footer>
   );
