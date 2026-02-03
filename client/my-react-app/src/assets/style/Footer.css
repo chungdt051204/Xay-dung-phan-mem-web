@@ -139,6 +139,14 @@
   color: #ef4444;
 }
 
+/* PNG icons inside social buttons */
+.social img.social-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+  object-fit: contain;
+}
+
 /* Footer bottom */
 .footer-bottom {
   border-top: 1px solid rgba(255,255,255,0.06);
