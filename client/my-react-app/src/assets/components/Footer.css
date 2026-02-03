@@ -1,64 +1,173 @@
-/* Footer styles: red gradient, responsive layout, accessible focus styles */
+/* Footer - clean, multi-column layout to match the provided design */
 .site-footer {
-  background: linear-gradient(90deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+  background: linear-gradient(90deg, #df3346 0%, #df3346 50%, #df3346 100%);
   color: #ffffff;
-  padding: 1.5rem 0;
+  padding-top: 2rem;
   margin-top: 2rem;
-  border-top: 4px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-.footer-inner {
+.footer-top {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 0 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+  padding: 2rem 1rem;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1.25fr;
+  gap: 2rem;
+  align-items: start;
 }
 
-.footer-copy {
+.footer-col h4 {
+  margin: 0 0 0.75rem 0;
   font-size: 0.875rem;
-  margin: 0;
+  letter-spacing: 0.06em;
+  color: #111827;
 }
 
-.footer-nav ul {
-  list-style: none;
+/* Brand */
+.brand-logo {
+  font-family: 'Pacifico', 'Brush Script MT', cursive;
+  font-size: 1.6rem;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+.brand-desc {
+  color: rgba(255,255,255,0.92);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 1rem 0;
+  max-width: 320px;
+}
+
+.payments {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
+  align-items: center;
+  /* allow wrapping on small screens */
+  flex-wrap: wrap;
+}
+.payment-icon {
+  width: 44px;
+  height: auto;
+  display: inline-block;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 0.4rem;
+  border-radius: 8px;
+  box-shadow: none;
+  object-fit: contain;
+}
+@media (max-width: 520px) {
+  .payment-icon { width: 36px; padding: 0.3rem; }
+}
+
+/* Links */
+.footer-links ul {
+  list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
-
-.footer-link {
-  color: #ffffff;
+.footer-links a {
+  color: rgba(255,255,255,0.95);
   text-decoration: none;
-  transition: color 150ms ease, transform 150ms ease;
+  font-size: 0.95rem;
 }
-
-.footer-link:hover,
-.footer-link:focus {
-  color: #fee2e2; /* lighter red for hover */
+.footer-links a:hover,
+.footer-links a:focus {
+  color: #fff;
   text-decoration: underline;
 }
 
-.footer-link:focus {
+/* Newsletter */
+.footer-newsletter .newsletter-control {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.newsletter-control input[type="email"] {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  font-size: 0.95rem;
   outline: none;
-  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.18);
-  border-radius: 4px;
+}
+.newsletter-control input[type="email"]:focus {
+  box-shadow: 0 0 0 4px rgba(14,165,233,0.08);
+  border-color: #60a5fa;
+}
+.subscribe-btn {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 0.52rem 0.9rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(239,68,68,0.14);
+}
+.subscribe-btn:hover,
+.subscribe-btn:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(239,68,68,0.18);
 }
 
-@media (min-width: 768px) {
-  .footer-inner {
-    flex-direction: row;
-  }
+.socials {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
 }
+.social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  text-decoration: none;
+}
+.social:hover,
+.social:focus {
+  background: #fff;
+  color: #ef4444;
+}
+
+/* Footer bottom */
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 1rem 0 2rem;
+  text-align: center;
+  color: rgba(255,255,255,0.9);
+  font-size: 0.9rem;
+}
+
+/* Small-screen responsive */
+@media (max-width: 900px) {
+  .footer-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .brand-desc { max-width: none; }
+}
+@media (max-width: 520px) {
+  .footer-top { grid-template-columns: 1fr; }
+  .newsletter-control { flex-direction: column; align-items: stretch; }
+  .subscribe-btn { width: 100%; }
+}
+
+/* Utility */
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
-  .footer-link {
-    transition: none;
-  }
+  .subscribe-btn,
+  .social,
+  .pay-badge { transition: none !important; }
 }
