@@ -4,16 +4,20 @@ import AppContext from "./AppContext";
 import { api } from "../../App";
 import "../style/Auth.css";
 import LoginGoogle from "./LoginGoogle";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 export default function Login() {
   const { setRefresh, setIsLogin, setMe } = useContext(AppContext);
   const navigate = useNavigate();
+
   const [err, setErr] = useState("");
   const input = useRef();
   const password = useRef();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     fetch(`${api}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -41,32 +45,38 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-wrapper">
-      <div className="auth-card">
-        <h2>ĐĂNG NHẬP</h2>
+    <>
+    <Navbar />
+      <div className="auth-wrapper">
+        <div className="auth-card auth-card--login">
+          <h2>ĐĂNG NHẬP</h2>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Tên đăng nhập/Email</label>
-            <input ref={input} required />
-          </div>
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Tên đăng nhập / Email</label>
+              <input ref={input} required />
+            </div>
 
-          <div className="form-group">
-            <label>Mật khẩu</label>
-            <input type="password" ref={password} required />
-          </div>
+            <div className="form-group">
+              <label>Mật khẩu</label>
+              <input type="password" ref={password} required />
+            </div>
 
-          {err && <p className="error">{err}</p>}
+            {err && <p className="error">{err}</p>}
 
-          <button className="btn-primary">Đăng nhập</button>
+            <button className="btn-primary">Đăng nhập</button>
 
-          <LoginGoogle />
+            <div className="google-login-wrapper">
+              <LoginGoogle />
+            </div>
 
-          <Link to="/register" className="auth-link">
-            Bạn chưa có tài khoản? <b>Đăng ký ngay</b>
-          </Link>
-        </form>
+            <Link to="/register" className="auth-link">
+              Bạn chưa có tài khoản? <b>Đăng ký ngay</b>
+            </Link>
+          </form>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }

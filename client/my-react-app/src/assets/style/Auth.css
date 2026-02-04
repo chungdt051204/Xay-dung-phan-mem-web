@@ -143,6 +143,17 @@
   align-items: center;
 }
 
+.auth-card--login {
+  max-width: 420px;
+  padding: 32px;
+}
+
+.google-login-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
 .btn-primary {
   width: 100%;
   padding: 14px;

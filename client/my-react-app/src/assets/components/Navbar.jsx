@@ -1,4 +1,4 @@
-import { useContext, useState, useRef, useEffect } from "react";
+import { useContext, useState } from "react";
 import AppContext from "./AppContext";
 import "../style/Navbar.css";
 import logo from "../../assets/Logo.png";
@@ -7,36 +7,32 @@ import { Link } from "react-router-dom";
 export default function Navbar() {
   const { isLogin, me } = useContext(AppContext);
   const [openUserMenu, setOpenUserMenu] = useState(false);
-  const menuRef = useRef(null);
-
-  // click ngoài thì đóng menu
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setOpenUserMenu(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
+  const [openCategoryMenu, setOpenCategoryMenu] = useState(false);
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <img src={logo} alt="Logo" className="navbar-logo" />
+        <Link to="/">
+          <img src={logo} alt="Logo" className="navbar-logo" />
+        </Link>
 
-        <div className="navbar-category-wrapper">
+        <div
+          className="navbar-category-wrapper"
+          onMouseEnter={() => setOpenCategoryMenu(true)}
+          onMouseLeave={() => setOpenCategoryMenu(false)}
+        >
           <button className="navbar-category">
             <i className="fa-solid fa-bars"></i>
             <span>Danh mục</span>
           </button>
 
-          <ul className="category-dropdown">
-            <li>📱 Điện thoại</li>
-            <li>💻 Laptop</li>
-            <li>🎧 Phụ kiện</li>
-            <li>📺 Tivi</li>
-          </ul>
+          {openCategoryMenu && (
+            <ul className="category-dropdown">
+              <li>📱 Điện thoại</li>
+              <li>💻 Laptop</li>
+              <li>🎧 Phụ kiện</li>
+              <li>📺 Tivi</li>
+            </ul>
+          )}
         </div>
       </div>
 
@@ -54,15 +50,17 @@ export default function Navbar() {
           <i className="fa-solid fa-cart-shopping"></i>
           <span>Giỏ hàng</span>
         </div>
-
         {isLogin && me ? (
-          <div className="user-menu-wrapper" ref={menuRef}>
+          <div
+            className="user-menu-wrapper"
+            onMouseEnter={() => setOpenUserMenu(true)}
+            onMouseLeave={() => setOpenUserMenu(false)}
+          >
             <img
               src={me.avatar}
               alt="avatar"
               className="user-avatar"
               referrerPolicy="no-referrer"
-              onClick={() => setOpenUserMenu(!openUserMenu)}
             />
 
             {openUserMenu && (
