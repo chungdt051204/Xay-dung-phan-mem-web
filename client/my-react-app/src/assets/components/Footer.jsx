@@ -102,10 +102,18 @@ export default function Footer() {
               <img src={youtubeIcon} alt="YouTube" className="social-icon" />
             </a>
             <a href="#" className="social" aria-label="Instagram">
-              <img src={instagramIcon} alt="Instagram" className="social-icon" />
+              <img
+                src={instagramIcon}
+                alt="Instagram"
+                className="social-icon"
+              />
             </a>
             <a href="#" className="social" aria-label="Pinterest">
-              <img src={pinterestIcon} alt="Pinterest" className="social-icon" />
+              <img
+                src={pinterestIcon}
+                alt="Pinterest"
+                className="social-icon"
+              />
             </a>
           </div>
         </div>

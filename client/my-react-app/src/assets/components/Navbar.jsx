@@ -68,15 +68,23 @@ export default function Navbar() {
             {openUserMenu && (
               <ul className="user-dropdown">
                 <li>
-                  <Link to="/profile"><i className="fa-regular fa-user"></i> Thông tin cá nhân</Link>
+                  <Link to="/profile">
+                    <i className="fa-regular fa-user"></i> Thông tin cá nhân
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/notifications"><i className="fa-regular fa-bell"></i> Thông báo</Link>
+                  <Link to="/notifications">
+                    <i className="fa-regular fa-bell"></i> Thông báo
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/orders"><i className="fa-solid fa-box"></i> Đơn hàng của tôi</Link>
+                  <Link to="/orders">
+                    <i className="fa-solid fa-box"></i> Đơn hàng của tôi
+                  </Link>
                 </li>
-                <li className="logout"><i className="fa-solid fa-right-from-bracket"></i> Đăng xuất</li>
+                <li className="logout">
+                  <i className="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                </li>
               </ul>
             )}
           </div>

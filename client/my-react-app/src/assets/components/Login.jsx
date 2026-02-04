@@ -22,12 +22,16 @@ export default function Login() {
         password: password.current.value,
       }),
     })
-      .then((res) => res.ok ? res.json() : Promise.reject(res))
-      .then(({ token, data }) => {
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw res;
+      })
+      .then(({ token, data, message }) => {
         localStorage.setItem("token", token);
         setIsLogin(true);
         setMe(data);
-        setRefresh(p => p + 1);
+        alert(message);
+        setRefresh((p) => p + 1);
         navigate("/");
       })
       .catch(async (err) => {
@@ -43,7 +47,7 @@ export default function Login() {
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Email / Số điện thoại</label>
+            <label>Tên đăng nhập/Email</label>
             <input ref={input} required />
           </div>
 

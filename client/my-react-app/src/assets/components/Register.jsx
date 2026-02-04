@@ -28,7 +28,7 @@ export default function Register() {
 
             <div className="form-group floating">
               <input type="email" placeholder=" " />
-              <label>Email (không bắt buộc)</label>
+              <label>Email </label>
             </div>
           </div>
 
