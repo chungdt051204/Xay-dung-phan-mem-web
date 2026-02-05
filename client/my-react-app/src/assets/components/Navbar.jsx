@@ -12,7 +12,7 @@ export default function Navbar() {
 
   const userMenuRef = useRef(null);
 
-  // 👉 click ra ngoài thì đóng user menu
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
@@ -33,12 +33,11 @@ export default function Navbar() {
           <img src={logo} alt="Logo" className="navbar-logo" />
         </Link>
 
-        <div
-          className="navbar-category-wrapper"
-          onMouseEnter={() => setOpenCategoryMenu(true)}
-          onMouseLeave={() => setOpenCategoryMenu(false)}
-        >
-          <button className="navbar-category">
+        <div className="navbar-category-wrapper">
+          <button
+            className="navbar-category"
+            onClick={() => setOpenCategoryMenu((prev) => !prev)}
+          >
             <i className="fa-solid fa-bars"></i>
             <span>Danh mục</span>
           </button>
@@ -52,6 +51,7 @@ export default function Navbar() {
             </ul>
           )}
         </div>
+
       </div>
 
       <div className="navbar-search">

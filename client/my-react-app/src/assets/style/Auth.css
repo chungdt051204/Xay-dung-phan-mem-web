@@ -264,6 +264,12 @@
   border-left: 4px solid #d32f2f;
 }
 
+.button-text {
+    margin-left: 10px;
+    margin-top: 10px;
+    padding-bottom: 17px;
+}
+
 .alert-success {
   background: #e8f5e9;
   color: #2e7d32;
