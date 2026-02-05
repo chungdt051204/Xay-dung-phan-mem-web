@@ -28,7 +28,7 @@ export default function Register() {
       ...prev,
       [name]: value,
     }));
-    setError(""); // Clear error when user starts typing
+    setError("");
   };
 
   const validateForm = () => {
@@ -121,7 +121,6 @@ export default function Register() {
         gender: "chưa chọn",
       });
 
-      // Redirect to login after 2 seconds
       setTimeout(() => {
         navigate("/login");
       }, 2000);

@@ -4,9 +4,6 @@
   box-sizing: border-box;
 }
 
-/* =========================
-   NAVBAR - DESKTOP FIRST
-========================= */
 .navbar {
   width: 100vw;
   min-height: 64px;
@@ -32,7 +29,6 @@
   cursor: pointer;
 }
 
-/* Category button */
 .navbar-category {
   background: rgba(255, 255, 255, 0.15);
   border: none;
@@ -49,9 +45,6 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* =========================
-   SEARCH BAR
-========================= */
 .navbar-search {
   position: absolute;
   left: 50%;
@@ -78,9 +71,6 @@
   margin: 5px;
 }
 
-/* =========================
-   RIGHT MENU
-========================= */
 .navbar-right {
   display: flex;
   align-items: center;
@@ -112,9 +102,6 @@
   border-radius: 6px;
 }
 
-/* =========================
-   TABLET (≤ 1200px)
-========================= */
 @media (max-width: 1200px) {
   .navbar {
     padding-left: 16px;
@@ -126,9 +113,6 @@
   }
 }
 
-/* =========================
-   MOBILE (≤ 768px)
-========================= */
 @media (max-width: 768px) {
 
   .navbar {

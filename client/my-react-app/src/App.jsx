@@ -60,15 +60,12 @@ function App() {
       value={{ refresh, setRefresh, isLogin, setIsLogin, me, setMe }}
     >
       <Routes>
-        {/* Routes cho phía User */}
         <Route path="/" element={<HomeUser />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-
-        {/* Routes cho phía Admin Dashboard - Thêm /admin vào đầu */}
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} /> {/* Đường dẫn mặc định /admin */}
-          <Route path="brands" element={<BrandManager />} /> {/* /admin/brands */}
+          <Route index element={<Dashboard />} />
+          <Route path="brands" element={<BrandManager />} />
           <Route path="categories" element={<CategoryManager />} />
           <Route path="products" element={<ProductManager />} />
           <Route path="users" element={<UserManager />} />

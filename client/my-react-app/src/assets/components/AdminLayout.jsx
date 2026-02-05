@@ -1,16 +1,27 @@
-import { useContext } from "react";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import AppContext from "./AppContext";
 import logo from "../../assets/Logo.png";
 import "../style/Admin.css";
 
 export default function AdminLayout() {
-  const { me } = useContext(AppContext);
+  const { me, isLogin, isLoading } = useContext(AppContext);
   const location = useLocation();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (!isLoading) {
+      if (!isLogin || me?.role !== "admin") {
+        navigate("/", { replace: true });
+      }
+    }
+  }, [isLoading, isLogin, me, navigate]);
 
   function isActive(path) {
     return location.pathname === path ? "active" : "";
   }
+
+  if (isLoading || !isLogin || me?.role !== "admin") return null;
 
   return (
     <div className="admin-wrapper">
