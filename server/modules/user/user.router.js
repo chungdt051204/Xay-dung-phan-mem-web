@@ -10,4 +10,6 @@ router.get(
 router.post(`${prefix}/register`, userController.postRegister);
 router.post(`${prefix}/login`, userController.postLogin);
 router.get(`${prefix}/me`, userController.getMe);
+router.post(`${prefix}/reset`, userController.postReset);
+router.post(`${prefix}/confirm`, userController.postConfirm);
 module.exports = router;

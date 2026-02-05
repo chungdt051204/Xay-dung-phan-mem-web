@@ -3,8 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { useState } from "react";
-
-const API_URL = "http://localhost:3000/user";
+import { api } from "../../App";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -84,9 +83,10 @@ export default function Register() {
     setLoading(true);
     setError("");
     setSuccess("");
-
+    localStorage.setItem("resetEmail", formData.email);
+    localStorage.setItem("method", "register");
     try {
-      const response = await fetch(`${API_URL}/register`, {
+      const response = await fetch(`${api}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -121,10 +121,7 @@ export default function Register() {
         gender: "chưa chọn",
       });
 
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
+      navigate("/confirm");
     } catch (err) {
       setError(err.message);
     } finally {

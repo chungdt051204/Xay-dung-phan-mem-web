@@ -2,6 +2,9 @@ const passport = require("passport");
 const base64url = require("../../helper");
 const userEntity = require("../../model/user.model");
 const crypto = require("crypto");
+const sendEmail = require("../../service/sendEmail");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 const jwtSecret =
   "shYnTMnSsbRecWsZx/pcjWMtlAx1RkZD3muD1n68BT71prXoWPblE85ass7GTIpNTkDNPz3osyT9NN9gOSyQl5W+Tj24JeLJD9ox60JDivz4UjSuciDhOS7ffeSzl2Gs8oq8UtrvSB7nfApSGExk1LsqkwCubjH51Dl0BtVZitk4zbdXevD6nq7JPppJY4PEWZAnyOwQT5tAVlBWptGGmGBadkQZ7AsU9wvo80kGYdTmA6aK3nOU2jaM+cS/pKGwJDA9ZWFE6fUk3oaLFF6jui/+0o7iVzK7ehN4d+UTE4u05XdCaulQZt9MsZjbeipnF+qeFdQh6EB5Wgbx+PN1fA==";
 
@@ -44,7 +47,7 @@ exports.postLogin = async (req, res) => {
     const user = await userEntity.findOne({
       $or: [{ email: input }, { username: input }],
     });
-    if (!user || password !== user.password)
+    if (!user || await bcrypt.compare(password, user.password) === false)
       return res
         .status(401)
         .json({ message: "Thông tin đăng nhập không hợp lệ" });
@@ -107,7 +110,6 @@ exports.postRegister = async (req, res) => {
     }
 
     // Hash password
-    const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Tạo user mới
@@ -123,6 +125,11 @@ exports.postRegister = async (req, res) => {
       status: "active",
     });
 
+    const code = Math.floor(100000 + Math.random() * 900000);
+    newUser.resetCode = code;
+    newUser.resetCodeExpiration = Date.now() + 5 * 60 * 1000;
+    await newUser.save();
+    await sendEmail(newUser.email, code);
     // Tạo JWT token
     const header = {
       alg: "HS256",
@@ -173,5 +180,40 @@ exports.getMe = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Lấy thông tin người dùng thất bại" });
+  }
+};
+
+exports.postReset = async (req, res) => {
+  try {
+    const user = await userEntity.findOne({ email: req.body.input });
+    if (!user) return res.status(404).json({message : "Không tìm thấy tài khoản với email đã nhập"});
+    if (user.loginMethod !== "Email thường") return res.status(400).json({message : "Tài khoản không được hỗ trợ reset mật khẩu"});
+    const code = Math.floor(100000 + Math.random() * 900000);
+    user.resetCode = code;
+    user.resetCodeExpiration = Date.now() + 5 * 60 * 1000;
+    await user.save();
+    await sendEmail(user.email, code);
+    return res.status(200).json({ message: "Mã xác nhận đã được gửi đến email của bạn" });
+  } catch (error) {
+    console.log("Có lỗi xảy ra khi xử lý hàm getReset", error);
+    return res.status(500).json({message : error.message});
+  }
+};
+
+exports.postConfirm = async (req, res) => {
+  try {
+    const inputCode = Number(req.body.input);
+    const user = await userEntity.findOne({ email: req.body.email });
+    if (user.resetCode !== inputCode) return res.status(400).json({message : "Mã xác nhận không hợp lệ"});
+    if (user.resetCodeExpiration < Date.now()) return res.status(400).json({message : "Mã xác nhận đã hết hạn"});
+    if(req.body?.method === "password")user.password = await bcrypt.hash(req.body.password, saltRounds);
+    user.resetCode = null;
+    user.resetCodeExpiration = null;
+    user.isVerified = true;
+    await user.save();
+    return res.sendStatus(200);
+  } catch (error) {
+    console.log("Có lỗi xảy ra khi xử lý hàm postConfirm", error);
+    return res.status(500).json({message : error.message});
   }
 };
