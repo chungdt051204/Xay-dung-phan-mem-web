@@ -7,6 +7,7 @@ router.get(
   `${prefix}/auth/google/callback`,
   userController.getResultLoginGoogle
 );
+router.post(`${prefix}/register`, userController.postRegister);
 router.post(`${prefix}/login`, userController.postLogin);
 router.get(`${prefix}/me`, userController.getMe);
 module.exports = router;
