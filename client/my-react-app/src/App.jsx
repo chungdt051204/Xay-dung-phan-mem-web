@@ -14,6 +14,8 @@ import CategoryManager from "./assets/pages/CategoryManager";
 import ProductManager from "./assets/pages/ProductManager";
 import UserManager from "./assets/pages/UserManager";
 import OrderManager from "./assets/pages/OrderManager";
+import  Password  from "./assets/pages/Password";
+import  Confirm  from "./assets/pages/Confirm";
 
 export const api = "http://localhost:3000";
 
@@ -64,6 +66,8 @@ function App() {
         <Route path="/" element={<HomeUser />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/password" element={<Password />} />
+        <Route path="/confirm" element={<Confirm />} />
 
         {/* Routes cho phía Admin Dashboard - Thêm /admin vào đầu */}
         <Route path="/admin" element={<AdminLayout />}>
