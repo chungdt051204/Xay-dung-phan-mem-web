@@ -2,7 +2,7 @@ import "../style/Auth.css";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { api } from "../../App";
 
 export default function Register() {
@@ -18,56 +18,32 @@ export default function Register() {
   const avatar = useRef();
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!validateForm()) return;
-
-    setLoading(true);
-    setError("");
-    setSuccess("");
-    localStorage.setItem("resetEmail", formData.email);
-    localStorage.setItem("method", "register");
-    try {
-      const response = await fetch(`${api}/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fullname: formData.fullname,
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-          phone: formData.phone,
-          dateOfBirth: formData.dateOfBirth,
-          gender: formData.gender,
-        }),
+    const formData = new FormData();
+    formData.append("fullname", fullname);
+    formData.append("username", username);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("confirmPassword", confirmPassword);
+    formData.append("phone", phone);
+    formData.append("dateOfBirth", dateOfBirth);
+    formData.append("gender", gender);
+    formData.append("avatar", avatar.current.files[0]);
+    fetch(`${api}/register`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw res;
+      })
+      .then(({ message }) => {
+        alert(message);
+        navigate("/login");
+      })
+      .catch(async (err) => {
+        const { message } = await err.json();
+        console.log(message);
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Đăng ký thất bại");
-      }
-
-      setSuccess("Đăng ký thành công! Chuyển hướng đến trang đăng nhập...");
-      setFormData({
-        fullname: "",
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        phone: "",
-        dateOfBirth: "",
-        gender: "chưa chọn",
-      });
-
-      navigate("/confirm");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
   };
   return (
     <>

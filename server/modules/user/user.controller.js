@@ -49,7 +49,7 @@ exports.postLogin = async (req, res) => {
     const user = await userEntity.findOne({
       $or: [{ email: input }, { username: input }],
     });
-    if (!user || await bcrypt.compare(password, user.password) === false)
+    if (!user || (await bcrypt.compare(password, user.password)) === false)
       return res
         .status(401)
         .json({ message: "Thông tin đăng nhập không hợp lệ" });
@@ -201,17 +201,25 @@ exports.getMe = async (req, res) => {
 exports.postReset = async (req, res) => {
   try {
     const user = await userEntity.findOne({ email: req.body.input });
-    if (!user) return res.status(404).json({message : "Không tìm thấy tài khoản với email đã nhập"});
-    if (user.loginMethod !== "Email thường") return res.status(400).json({message : "Tài khoản không được hỗ trợ reset mật khẩu"});
+    if (!user)
+      return res
+        .status(404)
+        .json({ message: "Không tìm thấy tài khoản với email đã nhập" });
+    if (user.loginMethod !== "Email thường")
+      return res
+        .status(400)
+        .json({ message: "Tài khoản không được hỗ trợ reset mật khẩu" });
     const code = Math.floor(100000 + Math.random() * 900000);
     user.resetCode = code;
     user.resetCodeExpiration = Date.now() + 5 * 60 * 1000;
     await user.save();
     await sendEmail(user.email, code);
-    return res.status(200).json({ message: "Mã xác nhận đã được gửi đến email của bạn" });
+    return res
+      .status(200)
+      .json({ message: "Mã xác nhận đã được gửi đến email của bạn" });
   } catch (error) {
     console.log("Có lỗi xảy ra khi xử lý hàm getReset", error);
-    return res.status(500).json({message : error.message});
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -219,9 +227,12 @@ exports.postConfirm = async (req, res) => {
   try {
     const inputCode = Number(req.body.input);
     const user = await userEntity.findOne({ email: req.body.email });
-    if (user.resetCode !== inputCode) return res.status(400).json({message : "Mã xác nhận không hợp lệ"});
-    if (user.resetCodeExpiration < Date.now()) return res.status(400).json({message : "Mã xác nhận đã hết hạn"});
-    if(req.body?.method === "password")user.password = await bcrypt.hash(req.body.password, saltRounds);
+    if (user.resetCode !== inputCode)
+      return res.status(400).json({ message: "Mã xác nhận không hợp lệ" });
+    if (user.resetCodeExpiration < Date.now())
+      return res.status(400).json({ message: "Mã xác nhận đã hết hạn" });
+    if (req.body?.method === "password")
+      user.password = await bcrypt.hash(req.body.password, saltRounds);
     user.resetCode = null;
     user.resetCodeExpiration = null;
     user.isVerified = true;
@@ -229,6 +240,6 @@ exports.postConfirm = async (req, res) => {
     return res.sendStatus(200);
   } catch (error) {
     console.log("Có lỗi xảy ra khi xử lý hàm postConfirm", error);
-    return res.status(500).json({message : error.message});
+    return res.status(500).json({ message: error.message });
   }
 };
