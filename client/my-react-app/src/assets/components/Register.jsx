@@ -2,62 +2,150 @@ import "../style/Auth.css";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { api } from "../../App";
 
 export default function Register() {
   const navigate = useNavigate();
-  const [fullname, setFullname] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [gender, setGender] = useState("");
-  const avatar = useRef();
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("fullname", fullname);
-    formData.append("username", username);
-    formData.append("email", email);
-    formData.append("password", password);
-    formData.append("confirmPassword", confirmPassword);
-    formData.append("phone", phone);
-    formData.append("dateOfBirth", dateOfBirth);
-    formData.append("gender", gender);
-    formData.append("avatar", avatar.current.files[0]);
-    fetch(`${api}/register`, {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => {
-        if (res.ok) return res.json();
-        throw res;
-      })
-      .then(({ message }) => {
-        alert(message);
-        navigate("/login");
-      })
-      .catch(async (err) => {
-        const { message } = await err.json();
-        console.log(message);
-      });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [formData, setFormData] = useState({
+    fullname: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
+    dateOfBirth: "",
+    gender: "chưa chọn",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setError(""); // Clear error when user starts typing
   };
+
+  const validateForm = () => {
+    if (
+      !formData.fullname ||
+      !formData.username ||
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword ||
+      !formData.phone ||
+      !formData.dateOfBirth
+    ) {
+      setError("Vui lòng điền đầy đủ thông tin");
+      return false;
+    }
+
+    if (formData.password.length < 6) {
+      setError("Mật khẩu phải có ít nhất 6 ký tự");
+      return false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Mật khẩu không trùng khớp");
+      return false;
+    }
+
+    if (!isValidEmail(formData.email)) {
+      setError("Email không hợp lệ");
+      return false;
+    }
+
+    if (!isValidPhone(formData.phone)) {
+      setError("Số điện thoại phải là 10 số");
+      return false;
+    }
+
+    return true;
+  };
+
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const isValidPhone = (phone) => {
+    return /^\d{10}$/.test(phone.replace(/\D/g, ""));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    setLoading(true);
+    setError("");
+    setSuccess("");
+    localStorage.setItem("resetEmail", formData.email);
+    localStorage.setItem("method", "register");
+    try {
+      const response = await fetch(`${api}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullname: formData.fullname,
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+          phone: formData.phone,
+          dateOfBirth: formData.dateOfBirth,
+          gender: formData.gender,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Đăng ký thất bại");
+      }
+
+      setSuccess("Đăng ký thành công! Chuyển hướng đến trang đăng nhập...");
+      setFormData({
+        fullname: "",
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        phone: "",
+        dateOfBirth: "",
+        gender: "chưa chọn",
+      });
+
+      navigate("/confirm");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <Navbar />
       <div className="auth-wrapper">
         <div className="auth-card">
           <h2>ĐĂNG KÝ</h2>
+          {error && <div className="alert alert-error">{error}</div>}
+          {success && <div className="alert alert-success">{success}</div>}
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group floating">
                 <input
-                  value={fullname}
-                  onChange={(e) => setFullname(e.target.value)}
                   type="text"
+                  name="fullname"
+                  placeholder=" "
+                  value={formData.fullname}
+                  onChange={handleChange}
                   required
                 />
                 <label>Họ và tên</label>
@@ -65,9 +153,11 @@ export default function Register() {
 
               <div className="form-group floating">
                 <input
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
                   type="text"
+                  name="username"
+                  placeholder=" "
+                  value={formData.username}
+                  onChange={handleChange}
                   required
                 />
                 <label>Tên đăng nhập</label>
@@ -76,9 +166,11 @@ export default function Register() {
             <div className="form-row">
               <div className="form-group floating">
                 <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   type="email"
+                  name="email"
+                  placeholder=" "
+                  value={formData.email}
+                  onChange={handleChange}
                   required
                 />
                 <label>Email</label>
@@ -87,9 +179,11 @@ export default function Register() {
             <div className="form-row">
               <div className="form-group floating">
                 <input
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   type="password"
+                  name="password"
+                  placeholder=" "
+                  value={formData.password}
+                  onChange={handleChange}
                   required
                 />
                 <label>Mật khẩu</label>
@@ -97,9 +191,11 @@ export default function Register() {
 
               <div className="form-group floating">
                 <input
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
                   type="password"
+                  name="confirmPassword"
+                  placeholder=" "
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
                   required
                 />
                 <label>Nhập lại mật khẩu</label>
@@ -108,18 +204,21 @@ export default function Register() {
             <div className="form-row">
               <div className="form-group floating">
                 <input
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
                   type="text"
+                  name="phone"
+                  placeholder=" "
+                  value={formData.phone}
+                  onChange={handleChange}
                   required
                 />
                 <label>Số điện thoại</label>
               </div>
               <div className="form-group floating">
                 <input
-                  value={dateOfBirth}
-                  onChange={(e) => setDateOfBirth(e.target.value)}
                   type="date"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={handleChange}
                   required
                 />
                 <label>Ngày sinh</label>
@@ -129,29 +228,28 @@ export default function Register() {
               <span>Giới tính:</span>
               <label>
                 <input
-                  checked={gender === "nam"}
-                  value="nam"
-                  onChange={(e) => setGender(e.target.value)}
                   type="radio"
+                  name="gender"
+                  value="nam"
+                  checked={formData.gender === "nam"}
+                  onChange={handleChange}
                 />
                 Nam
               </label>
               <label>
                 <input
-                  checked={gender === "nữ"}
-                  value="nữ"
-                  onChange={(e) => setGender(e.target.value)}
                   type="radio"
                   name="gender"
+                  value="nữ"
+                  checked={formData.gender === "nữ"}
+                  onChange={handleChange}
                 />
                 Nữ
               </label>
             </div>
-            <div className="form-group">
-              <label>Ảnh đại diện</label>
-              <input ref={avatar} type="file" name="avatar" accept="image/*" />
-            </div>
-            <button className="btn-primary">Hoàn tất đăng ký</button>
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? "Đang xử lý..." : "Hoàn tất đăng ký"}
+            </button>
             <Link to="/login" className="auth-link">
               ← Quay lại đăng nhập
             </Link>
