@@ -2,7 +2,7 @@ import "../style/Auth.css";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { api } from "../../App";
 
 export default function Register() {
@@ -20,6 +20,7 @@ export default function Register() {
     dateOfBirth: "",
     gender: "chưa chọn",
   });
+  const avatar = useRef();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -83,24 +84,22 @@ export default function Register() {
     setLoading(true);
     setError("");
     setSuccess("");
+    const dataToSend = new FormData();
+    dataToSend.append("fullname", formData.fullname);
+    dataToSend.append("username", formData.username);
+    dataToSend.append("email", formData.email);
+    dataToSend.append("password", formData.password);
+    dataToSend.append("confirmPassword", formData.confirmPassword);
+    dataToSend.append("phone", formData.phone);
+    dataToSend.append("dateOfBirth", formData.dateOfBirth);
+    dataToSend.append("gender", formData.gender);
+    dataToSend.append("avatar", avatar.current.files[0]);
     localStorage.setItem("resetEmail", formData.email);
     localStorage.setItem("method", "register");
     try {
       const response = await fetch(`${api}/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fullname: formData.fullname,
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-          phone: formData.phone,
-          dateOfBirth: formData.dateOfBirth,
-          gender: formData.gender,
-        }),
+        body: dataToSend,
       });
 
       const data = await response.json();
@@ -247,9 +246,14 @@ export default function Register() {
                 Nữ
               </label>
             </div>
+            <div className="form-group">
+              <label>Ảnh đại diện</label>
+              <input ref={avatar} type="file" name="avatar" accept="image/*" />
+            </div>
             <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? "Đang xử lý..." : "Hoàn tất đăng ký"}
             </button>
+
             <Link to="/login" className="auth-link">
               ← Quay lại đăng nhập
             </Link>

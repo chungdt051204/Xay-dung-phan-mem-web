@@ -95,6 +95,7 @@ exports.postRegister = async (req, res) => {
       dateOfBirth,
     } = req.body;
     const avatar = req.file.path;
+    console.log(req.body);
     // Kiểm tra username đã tồn tại
     const existingUsername = await userEntity.findOne({ username });
     if (existingUsername) {
@@ -128,7 +129,7 @@ exports.postRegister = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Tạo user mới
-    await userEntity.create({
+    const newUser = await userEntity.create({
       fullname,
       username,
       email,
