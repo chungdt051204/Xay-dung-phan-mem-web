@@ -46,7 +46,7 @@ export default function Login() {
 
   return (
     <>
-    <Navbar />
+      <Navbar />
       <div className="auth-wrapper">
         <div className="auth-card auth-card--login">
           <h2>ĐĂNG NHẬP</h2>

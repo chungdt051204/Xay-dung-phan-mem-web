@@ -1,9 +1,10 @@
+require("dotenv").config();
 const passport = require("passport");
 const base64url = require("../../helper");
 const userEntity = require("../../model/user.model");
 const crypto = require("crypto");
-const jwtSecret =
-  "shYnTMnSsbRecWsZx/pcjWMtlAx1RkZD3muD1n68BT71prXoWPblE85ass7GTIpNTkDNPz3osyT9NN9gOSyQl5W+Tj24JeLJD9ox60JDivz4UjSuciDhOS7ffeSzl2Gs8oq8UtrvSB7nfApSGExk1LsqkwCubjH51Dl0BtVZitk4zbdXevD6nq7JPppJY4PEWZAnyOwQT5tAVlBWptGGmGBadkQZ7AsU9wvo80kGYdTmA6aK3nOU2jaM+cS/pKGwJDA9ZWFE6fUk3oaLFF6jui/+0o7iVzK7ehN4d+UTE4u05XdCaulQZt9MsZjbeipnF+qeFdQh6EB5Wgbx+PN1fA==";
+const bcrypt = require("bcrypt");
+const jwtSecret = process.env.JWT_SECRET;
 
 //Hàm chuyển hướng đến trang đăng nhập google
 exports.getLoginGoogle = passport.authenticate("google", {
@@ -41,10 +42,11 @@ exports.getResultLoginGoogle = [
 exports.postLogin = async (req, res) => {
   try {
     const { input, password } = req.body;
+    console.log(btoa(password));
     const user = await userEntity.findOne({
       $or: [{ email: input }, { username: input }],
     });
-    if (!user || password !== user.password)
+    if (!user || btoa(password) !== user.password)
       return res
         .status(401)
         .json({ message: "Thông tin đăng nhập không hợp lệ" });
@@ -79,39 +81,51 @@ exports.postLogin = async (req, res) => {
 };
 exports.postRegister = async (req, res) => {
   try {
-    const { fullname, username, email, password, confirmPassword, phone, gender, dateOfBirth } = req.body;
+    const {
+      fullname,
+      username,
+      email,
+      password,
+      confirmPassword,
+      phone,
+      gender,
+      dateOfBirth,
+    } = req.body;
+    const avatar = req.file.path;
+    // Kiểm tra username đã tồn tại
+    const existingUsername = await userEntity.findOne({ username });
+    if (existingUsername) {
+      return res.status(409).json({ message: "Tên đăng nhập này đã tồn tại" });
+    }
+
+    // Kiểm tra email đã tồn tại
+    const existingEmail = await userEntity.findOne({
+      $and: [{ email }, { loginMethod: "Email thường" }],
+    });
+    if (existingEmail) {
+      return res.status(409).json({ message: "Email này đã được đăng ký" });
+    }
 
     // Kiểm tra mật khẩu trùng khớp
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Mật khẩu không trùng khớp" });
     }
 
-    // Kiểm tra username đã tồn tại
-    const existingUsername = await userEntity.findOne({ username });
-    if (existingUsername) {
-      return res.status(400).json({ message: "Tên đăng nhập đã tồn tại" });
-    }
-
-    // Kiểm tra email đã tồn tại
-    const existingEmail = await userEntity.findOne({ email });
-    if (existingEmail) {
-      return res.status(400).json({ message: "Email đã được đăng ký" });
-    }
-
     // Kiểm tra số điện thoại đã tồn tại
     if (phone) {
       const existingPhone = await userEntity.findOne({ phone });
       if (existingPhone) {
-        return res.status(400).json({ message: "Số điện thoại đã được đăng ký" });
+        return res
+          .status(409)
+          .json({ message: "Số điện thoại này đã được đăng ký" });
       }
     }
 
-    // Hash password
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    // Mã hóa password bằng hàm btoa
+    const hashedPassword = btoa(password);
 
     // Tạo user mới
-    const newUser = await userEntity.create({
+    await userEntity.create({
       fullname,
       username,
       email,
@@ -119,34 +133,18 @@ exports.postRegister = async (req, res) => {
       phone,
       gender,
       dateOfBirth,
+      avatar,
       loginMethod: "Email thường",
-      status: "active",
     });
 
-    // Tạo JWT token
-    const header = {
-      alg: "HS256",
-      typ: "JWT",
-    };
-    const payload = {
-      sub: newUser._id,
-      exp: Date.now() + 3600000, //Token hạn 1 tiếng
-    };
-    const encodedHeader = base64url(JSON.stringify(header));
-    const encodedPayload = base64url(JSON.stringify(payload));
-    const tokenData = `${encodedHeader}.${encodedPayload}`;
-    const hmac = crypto.createHmac("sha256", jwtSecret);
-    const signature = hmac.update(tokenData).digest("base64url");
-    const token = tokenData + "." + signature;
-
-    return res.status(201).json({
+    return res.status(200).json({
       message: "Đăng ký thành công",
-      token,
-      data: newUser,
     });
   } catch (error) {
     console.log("Có lỗi xảy ra khi xử lý hàm postRegister:", error);
-    return res.status(500).json({ message: "Đăng ký thất bại", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Đăng ký thất bại", error: error.message });
   }
 };
 exports.getMe = async (req, res) => {
