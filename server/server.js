@@ -1,3 +1,4 @@
+require("dns").setDefaultResultOrder("ipv4first");
 const connectDB = require("./config/connectDB");
 const userEntity = require("./model/user.model");
 require("dotenv").config();
@@ -10,7 +11,7 @@ const cors = require("cors");
 connectDB();
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://nhom4-chieu-thu-2.netlify.app",
     credentials: true,
   })
 );
