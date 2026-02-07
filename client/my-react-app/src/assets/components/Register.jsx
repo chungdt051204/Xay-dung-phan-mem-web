@@ -1,131 +1,99 @@
-import "../style/Auth.css";
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { api } from "../../App";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import { useRef, useState } from "react";
-import { api } from "../../App";
+import "../style/Auth.css";
 
 export default function Register() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [formData, setFormData] = useState({
-    fullname: "",
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phone: "",
-    dateOfBirth: "",
-    gender: "chưa chọn",
+  const phoneRegex = /^0\d{9}$/;
+  const registerSchema = z
+    .object({
+      fullname: z.string().trim().min(1, "Họ tên không được bỏ trống"),
+      username: z
+        .string()
+        .trim()
+        .min(1, "Tên đăng nhập phải có tối thiểu 5 ký tự"),
+      email: z.email("Email không đúng định dạng"),
+      password: z.string().trim().min(8, "Mật khẩu phải có ít nhất 8 ký tự"),
+      confirmPassword: z.string(),
+      phone: z
+        .string()
+        .min(1, "Vui lòng nhập số điện thoại")
+        .regex(phoneRegex, "Số điện thoại không hợp lệ"),
+      dateOfBirth: z.coerce.date("Vui lòng chọn ngày sinh hợp lệ"),
+      gender: z
+        .enum(["nam", "nữ", "chưa chọn"])
+        .optional()
+        .default("chưa chọn"),
+      avatar: z
+        .any()
+        .refine((files) => files?.length > 0, "Vui lòng chọn file"),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: "Mật khẩu không khớp",
+      path: ["confirmPassword"],
+    });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      fullname: "",
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      phone: "",
+      dateOfBirth: "",
+      gender: "chưa chọn",
+    },
+    mode: "onTouched",
   });
-  const avatar = useRef();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    setError(""); // Clear error when user starts typing
-  };
-
-  const validateForm = () => {
-    if (
-      !formData.fullname ||
-      !formData.username ||
-      !formData.email ||
-      !formData.password ||
-      !formData.confirmPassword ||
-      !formData.phone ||
-      !formData.dateOfBirth
-    ) {
-      setError("Vui lòng điền đầy đủ thông tin");
-      return false;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Mật khẩu phải có ít nhất 6 ký tự");
-      return false;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Mật khẩu không trùng khớp");
-      return false;
-    }
-
-    if (!isValidEmail(formData.email)) {
-      setError("Email không hợp lệ");
-      return false;
-    }
-
-    if (!isValidPhone(formData.phone)) {
-      setError("Số điện thoại phải là 10 số");
-      return false;
-    }
-
-    return true;
-  };
-
-  const isValidEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const isValidPhone = (phone) => {
-    return /^\d{10}$/.test(phone.replace(/\D/g, ""));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
+  const onSubmit = (data) => {
     setLoading(true);
-    setError("");
-    setSuccess("");
     const dataToSend = new FormData();
-    dataToSend.append("fullname", formData.fullname);
-    dataToSend.append("username", formData.username);
-    dataToSend.append("email", formData.email);
-    dataToSend.append("password", formData.password);
-    dataToSend.append("confirmPassword", formData.confirmPassword);
-    dataToSend.append("phone", formData.phone);
-    dataToSend.append("dateOfBirth", formData.dateOfBirth);
-    dataToSend.append("gender", formData.gender);
-    dataToSend.append("avatar", avatar.current.files[0]);
-    localStorage.setItem("resetEmail", formData.email);
+    dataToSend.append("fullname", data.fullname);
+    dataToSend.append("username", data.username);
+    dataToSend.append("email", data.email);
+    dataToSend.append("password", data.password);
+    dataToSend.append("confirmPassword", data.confirmPassword);
+    dataToSend.append("phone", data.phone);
+    dataToSend.append("dateOfBirth", data.dateOfBirth);
+    dataToSend.append("gender", data.gender);
+    dataToSend.append("avatar", data.avatar[0]);
+    localStorage.setItem("resetEmail", data.email);
     localStorage.setItem("method", "register");
-    try {
-      const response = await fetch(`${api}/register`, {
-        method: "POST",
-        body: dataToSend,
+    fetch(`${api}/register`, {
+      method: "POST",
+      body: dataToSend,
+    })
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw res;
+      })
+      .then(({ message }) => {
+        alert(message);
+        navigate("/confirm");
+      })
+      .catch(async (err) => {
+        if (err.status === 409) {
+          const { message } = await err.json();
+          setError(message);
+        }
+      })
+      .finally(() => {
+        setLoading(false);
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Đăng ký thất bại");
-      }
-
-      setSuccess("Đăng ký thành công! Chuyển hướng đến trang đăng nhập...");
-      setFormData({
-        fullname: "",
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        phone: "",
-        dateOfBirth: "",
-        gender: "chưa chọn",
-      });
-
-      navigate("/confirm");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -134,122 +102,75 @@ export default function Register() {
       <div className="auth-wrapper">
         <div className="auth-card">
           <h2>ĐĂNG KÝ</h2>
-          {error && <div className="alert alert-error">{error}</div>}
-          {success && <div className="alert alert-success">{success}</div>}
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
             <div className="form-row">
               <div className="form-group floating">
-                <input
-                  type="text"
-                  name="fullname"
-                  placeholder=" "
-                  value={formData.fullname}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("fullname")} type="text" />
                 <label>Họ và tên</label>
+                <strong>{errors?.fullname?.message}</strong>
               </div>
 
               <div className="form-group floating">
-                <input
-                  type="text"
-                  name="username"
-                  placeholder=" "
-                  value={formData.username}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("username")} type="text" />
                 <label>Tên đăng nhập</label>
+                <strong>{errors?.username?.message}</strong>
               </div>
             </div>
             <div className="form-row">
               <div className="form-group floating">
-                <input
-                  type="email"
-                  name="email"
-                  placeholder=" "
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("email")} type="text" />
                 <label>Email</label>
+                <strong>{error ? error : ""}</strong>
+                <strong>{errors?.email?.message}</strong>
               </div>
             </div>
             <div className="form-row">
               <div className="form-group floating">
-                <input
-                  type="password"
-                  name="password"
-                  placeholder=" "
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("password")} type="password" />
                 <label>Mật khẩu</label>
+                <strong>{errors?.password?.message}</strong>
               </div>
 
               <div className="form-group floating">
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  placeholder=" "
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("confirmPassword")} type="password" />
                 <label>Nhập lại mật khẩu</label>
+                <strong>{errors?.confirmPassword?.message}</strong>
               </div>
             </div>
             <div className="form-row">
               <div className="form-group floating">
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder=" "
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("phone")} type="text" />
                 <label>Số điện thoại</label>
+                <strong>{errors?.phone?.message}</strong>
               </div>
+
               <div className="form-group floating">
-                <input
-                  type="date"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("dateOfBirth")} type="date" />
                 <label>Ngày sinh</label>
+                <strong>{errors?.dateOfBirth?.message}</strong>
               </div>
             </div>
             <div className="gender">
               <span>Giới tính:</span>
               <label>
-                <input
-                  type="radio"
-                  name="gender"
-                  value="nam"
-                  checked={formData.gender === "nam"}
-                  onChange={handleChange}
-                />
+                <input {...register("gender")} type="radio" value="nam" />
                 Nam
               </label>
               <label>
-                <input
-                  type="radio"
-                  name="gender"
-                  value="nữ"
-                  checked={formData.gender === "nữ"}
-                  onChange={handleChange}
-                />
+                <input {...register("gender")} type="radio" value="nữ" />
                 Nữ
               </label>
             </div>
             <div className="form-group">
               <label>Ảnh đại diện</label>
-              <input ref={avatar} type="file" name="avatar" accept="image/*" />
+              <input
+                {...register("avatar")}
+                type="file"
+                name="avatar"
+                accept="image/*"
+              />
             </div>
+            <strong>{errors?.avatar?.message}</strong>
             <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? "Đang xử lý..." : "Hoàn tất đăng ký"}
             </button>

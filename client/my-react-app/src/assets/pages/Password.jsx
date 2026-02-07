@@ -6,28 +6,27 @@ import "../style/Auth.css";
 export default function Password() {
   const navigate = useNavigate();
   const [err, setErr] = useState("");
-  const input = useRef();
+  const email = useRef();
   const password = useRef();
   const confirmPassword = useRef();
 
   const handleSubmit = (e) => {
-      e.preventDefault();
-      fetch(`${api}/reset`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          input: input.current.value,
-          password: password.current.value,
-        }),
-      })
-        .then((res) => {if (!res.ok) return Promise.reject(res);
-          localStorage.setItem("resetPassword", password.current.value);
-          localStorage.setItem("resetEmail", input.current.value);
-          localStorage.setItem("method", "password");
-          navigate("/confirm");
-})
-    };
-  
+    e.preventDefault();
+    fetch(`${api}/reset`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: email.current.value,
+        password: password.current.value,
+      }),
+    }).then((res) => {
+      if (!res.ok) return Promise.reject(res);
+      localStorage.setItem("resetPassword", password.current.value);
+      localStorage.setItem("resetEmail", email.current.value);
+      localStorage.setItem("method", "password");
+      navigate("/confirm");
+    });
+  };
 
   return (
     <div className="auth-wrapper">
@@ -37,7 +36,7 @@ export default function Password() {
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Email</label>
-            <input ref={input} required />
+            <input ref={email} required />
           </div>
 
           <div className="form-group">
@@ -57,9 +56,8 @@ export default function Password() {
           <Link to="/login" className="auth-link">
             Quay lại <b>Đăng nhập</b>
           </Link>
-
         </form>
       </div>
     </div>
-  )
+  );
 }
