@@ -46,7 +46,7 @@ export default function Login() {
 
   return (
     <>
-    <Navbar />
+      <Navbar />
       <div className="auth-wrapper">
         <div className="auth-card auth-card--login">
           <h2>ĐĂNG NHẬP</h2>
@@ -69,7 +69,9 @@ export default function Login() {
             <div className="google-login-wrapper">
               <LoginGoogle />
             </div>
-
+            <Link to="/password" className="auth-link">
+              Quên mật khẩu
+            </Link>
             <Link to="/register" className="auth-link">
               Bạn chưa có tài khoản? <b>Đăng ký ngay</b>
             </Link>

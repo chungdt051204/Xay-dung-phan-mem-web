@@ -1,10 +1,12 @@
-import "../style/Auth.css";
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { api } from "../../App";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import { useState } from "react";
-
-const API_URL = "http://localhost:3000/user";
+import "../style/Auth.css";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ export default function Register() {
       ...prev,
       [name]: value,
     }));
-    setError("");
+    setError(""); // Clear error when user starts typing
   };
 
   const validateForm = () => {
@@ -121,6 +123,7 @@ export default function Register() {
         gender: "chưa chọn",
       });
 
+      // Redirect to login after 2 seconds
       setTimeout(() => {
         navigate("/login");
       }, 2000);
@@ -137,121 +140,79 @@ export default function Register() {
       <div className="auth-wrapper">
         <div className="auth-card">
           <h2>ĐĂNG KÝ</h2>
-          {error && <div className="alert alert-error">{error}</div>}
-          {success && <div className="alert alert-success">{success}</div>}
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
             <div className="form-row">
               <div className="form-group floating">
-                <input
-                  type="text"
-                  name="fullname"
-                  placeholder=" "
-                  value={formData.fullname}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("fullname")} type="text" />
                 <label>Họ và tên</label>
+                <strong>{errors?.fullname?.message}</strong>
               </div>
 
               <div className="form-group floating">
-                <input
-                  type="text"
-                  name="username"
-                  placeholder=" "
-                  value={formData.username}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("username")} type="text" />
                 <label>Tên đăng nhập</label>
+                <strong>{errors?.username?.message}</strong>
               </div>
             </div>
             <div className="form-row">
               <div className="form-group floating">
-                <input
-                  type="email"
-                  name="email"
-                  placeholder=" "
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("email")} type="text" />
                 <label>Email</label>
+                <strong>{error ? error : ""}</strong>
+                <strong>{errors?.email?.message}</strong>
               </div>
             </div>
             <div className="form-row">
               <div className="form-group floating">
-                <input
-                  type="password"
-                  name="password"
-                  placeholder=" "
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("password")} type="password" />
                 <label>Mật khẩu</label>
+                <strong>{errors?.password?.message}</strong>
               </div>
 
               <div className="form-group floating">
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  placeholder=" "
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("confirmPassword")} type="password" />
                 <label>Nhập lại mật khẩu</label>
+                <strong>{errors?.confirmPassword?.message}</strong>
               </div>
             </div>
             <div className="form-row">
               <div className="form-group floating">
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder=" "
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("phone")} type="text" />
                 <label>Số điện thoại</label>
+                <strong>{errors?.phone?.message}</strong>
               </div>
+
               <div className="form-group floating">
-                <input
-                  type="date"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth}
-                  onChange={handleChange}
-                  required
-                />
+                <input {...register("dateOfBirth")} type="date" />
                 <label>Ngày sinh</label>
+                <strong>{errors?.dateOfBirth?.message}</strong>
               </div>
             </div>
             <div className="gender">
               <span>Giới tính:</span>
               <label>
-                <input
-                  type="radio"
-                  name="gender"
-                  value="nam"
-                  checked={formData.gender === "nam"}
-                  onChange={handleChange}
-                />
+                <input {...register("gender")} type="radio" value="nam" />
                 Nam
               </label>
               <label>
-                <input
-                  type="radio"
-                  name="gender"
-                  value="nữ"
-                  checked={formData.gender === "nữ"}
-                  onChange={handleChange}
-                />
+                <input {...register("gender")} type="radio" value="nữ" />
                 Nữ
               </label>
             </div>
+            <div className="form-group">
+              <label>Ảnh đại diện</label>
+              <input
+                {...register("avatar")}
+                type="file"
+                name="avatar"
+                accept="image/*"
+              />
+            </div>
+            <strong>{errors?.avatar?.message}</strong>
             <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? "Đang xử lý..." : "Hoàn tất đăng ký"}
             </button>
+
             <Link to="/login" className="auth-link">
               ← Quay lại đăng nhập
             </Link>

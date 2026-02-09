@@ -1,3 +1,4 @@
+require("dns").setDefaultResultOrder("ipv4first");
 const connectDB = require("./config/connectDB");
 const userEntity = require("./model/user.model");
 require("dotenv").config();
@@ -10,12 +11,13 @@ const cors = require("cors");
 connectDB();
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://nhom4-chieu-thu-2.netlify.app",
     credentials: true,
   })
 );
 const userRouter = require("./modules/user/user.router");
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Để đọc dữ liệu từ Form
 app.use("/", userRouter);
 //Xử lý đăng nhập google
 passport.use(
