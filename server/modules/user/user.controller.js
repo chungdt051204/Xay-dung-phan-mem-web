@@ -38,19 +38,18 @@ exports.getResultLoginGoogle = [
     //Tạo signature
     const hmac = crypto.createHmac("sha256", jwtSecret);
     const signature = hmac.update(tokenData).digest("base64url");
-    res.redirect(
-      `https://nhom4-chieu-thu-2.netlify.app?token=${
-        tokenData + "." + signature
-      }`
-    ); //Đăng nhập google thành công thì tạo jwt token và chuyển hướng về trang chủ đính kèm token vừa tạo
+    res.redirect(`http://localhost:5173?token=${tokenData + "." + signature}`); //Đăng nhập google thành công thì tạo jwt token và chuyển hướng về trang chủ đính kèm token vừa tạo
   },
 ];
 exports.postLogin = async (req, res) => {
   try {
     const { input, password } = req.body;
-    console.log(btoa(password));
+    console.log(req.body);
     const user = await userEntity.findOne({
-      $or: [{ email: input }, { username: input }],
+      $and: [
+        { $or: [{ email: input }, { username: input }] },
+        { loginMethod: "Email thường" },
+      ],
     });
     if (!user || (await bcrypt.compare(password, user.password)) === false)
       return res

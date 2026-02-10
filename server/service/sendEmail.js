@@ -1,26 +1,26 @@
+require("dotenv").config();
 const nodemailer = require("nodemailer");
+const transporter = nodemailer.createTransport({
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.SMTP_KEY,
+  },
+});
 
-const sendEmail = async (to, code, subject) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  try {
-    const info = await transporter.sendMail({
-      from: "Nhom4.com     <huy91856@gmail.com>",
-      to: to,
-      subject: subject,
-      text: "Confirm Code: " + code,
+const sendEmail = (to, code, subject) => {
+  transporter
+    .sendMail({
+      from: "ChungDo <huy91856@gmail.com>",
+      to,
+      subject,
+      text: `Confirm Code: ${code}`,
       html: `<b>Code: ${code}</b>`,
-    });
-    console.log("Message sent:", info.messageId);
-    return info;
-  } catch (err) {
-    console.log("Error occurred. " + err.message);
-  }
+    })
+    .then(() => console.log("✅ Email sent"))
+    .catch((err) => console.error("❌ Send email error:", err.message));
 };
+
 module.exports = sendEmail;

@@ -86,10 +86,12 @@ export default function Register() {
         navigate("/confirm");
       })
       .catch(async (err) => {
-        if (err.status === 409) {
-          const { message } = await err.json();
-          setError(message);
-        }
+        const { message } = await err.json();
+        console.log(message);
+        // if (err.status === 409) {
+        //   const { message } = await err.json();
+        //   setError(message);
+        // }
       })
       .finally(() => {
         setLoading(false);
