@@ -1,6 +1,7 @@
 import { useRef, useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import AppContext from "./AppContext";
+import { toast } from "react-toastify";
 import { api } from "../../App";
 import "../style/Auth.css";
 import LoginGoogle from "./LoginGoogle";
@@ -34,9 +35,11 @@ export default function Login() {
         localStorage.setItem("token", token);
         setIsLogin(true);
         setMe(data);
-        alert(message);
+        toast.success(message);
+        setTimeout(() => {
+          data.roles === "admin" ? navigate("/admin") : navigate("/");
+        }, 1000);
         setRefresh((p) => p + 1);
-        navigate("/");
       })
       .catch(async (err) => {
         const { message } = await err.json();

@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { api } from "../../App";
+import { toast } from "react-toastify";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import "../style/Auth.css";
@@ -82,8 +83,10 @@ export default function Register() {
         throw res;
       })
       .then(({ message }) => {
-        alert(message);
-        navigate("/confirm");
+        toast.success(message);
+        setTimeout(() => {
+          navigate("/confirm");
+        }, 1000);
       })
       .catch(async (err) => {
         if (err.status === 409) {

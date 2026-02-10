@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { api } from "../../App";
+import { toast } from "react-toastify";
 import "../style/Auth.css";
 
 export default function Confirm() {
@@ -26,8 +27,10 @@ export default function Confirm() {
         localStorage.removeItem("resetPassword");
         localStorage.removeItem("resetEmail");
         localStorage.removeItem("method");
-        window.alert("Xác nhận thành công!");
-        navigate("/login");
+        toast.success("Xác nhận thành công");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
       })
       .catch(async (err) => {
         const { message } = await err.json();

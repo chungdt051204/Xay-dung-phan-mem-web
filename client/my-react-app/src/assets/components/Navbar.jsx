@@ -2,11 +2,12 @@ import { useContext, useState, useRef, useEffect } from "react";
 import AppContext from "./AppContext";
 import "../style/Navbar.css";
 import logo from "../../assets/Logo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Navbar() {
-  const { isLogin, me } = useContext(AppContext);
-
+  const navigate = useNavigate();
+  const { isLogin, setIsLogin, setRefresh, me } = useContext(AppContext);
   const [openUserMenu, setOpenUserMenu] = useState(false);
   const [openCategoryMenu, setOpenCategoryMenu] = useState(false);
 
@@ -25,6 +26,14 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLogin(false);
+    toast.success("Đăng xuất thành công");
+    setRefresh((prev) => prev + 1);
+    navigate("/");
+  };
 
   return (
     <nav className="navbar">
@@ -82,10 +91,7 @@ export default function Navbar() {
             {openUserMenu && (
               <ul className="user-dropdown">
                 <li>
-                  <Link
-                    to="/profile"
-                    onClick={() => setOpenUserMenu(false)}
-                  >
+                  <Link to="/profile" onClick={() => setOpenUserMenu(false)}>
                     <i className="fa-regular fa-user"></i> Thông tin cá nhân
                   </Link>
                 </li>
@@ -100,26 +106,21 @@ export default function Navbar() {
                 </li>
 
                 <li>
-                  <Link
-                    to="/orders"
-                    onClick={() => setOpenUserMenu(false)}
-                  >
+                  <Link to="/orders" onClick={() => setOpenUserMenu(false)}>
                     <i className="fa-solid fa-box"></i> Đơn hàng của tôi
                   </Link>
                 </li>
 
                 {me.roles === "admin" && (
                   <li>
-                    <Link
-                      to="/admin"
-                      onClick={() => setOpenUserMenu(false)}
-                    >
-                      <i className="fa-solid fa-user-shield"></i> Admin Dashboard
+                    <Link to="/admin" onClick={() => setOpenUserMenu(false)}>
+                      <i className="fa-solid fa-user-shield"></i> Admin
+                      Dashboard
                     </Link>
                   </li>
                 )}
 
-                <li className="logout">
+                <li onClick={handleLogout} className="logout">
                   <i className="fa-solid fa-right-from-bracket"></i> Đăng xuất
                 </li>
               </ul>

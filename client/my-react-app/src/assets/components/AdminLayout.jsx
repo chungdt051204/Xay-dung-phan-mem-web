@@ -1,17 +1,17 @@
-import { useContext } from "react";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import AppContext from "./AppContext";
 import logo from "../../assets/Logo.png";
 import "../style/Admin.css";
 
 export default function AdminLayout() {
-  const { me } = useContext(AppContext);
-  const location = useLocation();
-
-  function isActive(path) {
-    return location.pathname === path ? "active" : "";
-  }
-
+  const navigate = useNavigate();
+  const { isLoading, isLogin, isAdmin, me } = useContext(AppContext);
+  useEffect(() => {
+    if (!isLoading) {
+      if (!isLogin || me?.roles !== "admin") navigate("/");
+    } else navigate("/");
+  }, [isLoading, isLogin, me, navigate]);
   return (
     <div className="admin-wrapper">
       <aside className="admin-sidebar">
@@ -36,32 +36,32 @@ export default function AdminLayout() {
         <nav className="admin-nav">
           <p className="nav-label">QUẢN TRỊ</p>
 
-          <Link to="/admin" className={isActive("/admin")}>
+          <Link to="/admin">
             <i className="fa-solid fa-chart-line"></i>
             <span>Dashboard</span>
           </Link>
 
-          <Link to="/admin/brands" className={isActive("/admin/brands")}>
+          <Link to="/admin/brands">
             <i className="fa-solid fa-tags"></i>
             <span>Thương hiệu</span>
           </Link>
 
-          <Link to="/admin/categories" className={isActive("/admin/categories")}>
+          <Link to="/admin/categories">
             <i className="fa-solid fa-layer-group"></i>
             <span>Loại sản phẩm</span>
           </Link>
 
-          <Link to="/admin/products" className={isActive("/admin/products")}>
+          <Link to="/admin/products">
             <i className="fa-solid fa-box-open"></i>
             <span>Sản phẩm</span>
           </Link>
 
-          <Link to="/admin/users" className={isActive("/admin/users")}>
+          <Link to="/admin/users">
             <i className="fa-solid fa-users-gear"></i>
             <span>Người dùng</span>
           </Link>
 
-          <Link to="/admin/orders" className={isActive("/admin/orders")}>
+          <Link to="/admin/orders">
             <i className="fa-solid fa-cart-flatbed"></i>
             <span>Đơn hàng</span>
           </Link>
