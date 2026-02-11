@@ -5,7 +5,7 @@ import logo from "../../assets/Logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-export default function Navbar() {
+export default function UserNavbar() {
   const navigate = useNavigate();
   const { isLogin, setIsLogin, setRefresh, me } = useContext(AppContext);
   const [openUserMenu, setOpenUserMenu] = useState(false);

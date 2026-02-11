@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import { Outlet, Link, useNavigate } from "react-router-dom";
-import AppContext from "./AppContext";
+import AppContext from "../components/AppContext";
 import logo from "../../assets/Logo.png";
 import "../style/Admin.css";
 

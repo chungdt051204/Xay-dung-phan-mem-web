@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { api } from "../../App";
 import { toast } from "react-toastify";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
+import Navbar from "../components/UserNavbar";
+import Footer from "../components/Footer";
 import "../style/Auth.css";
 
 export default function Register() {

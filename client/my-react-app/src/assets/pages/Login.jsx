@@ -1,12 +1,12 @@
 import { useRef, useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import AppContext from "./AppContext";
+import AppContext from "../components/AppContext";
 import { toast } from "react-toastify";
 import { api } from "../../App";
 import "../style/Auth.css";
-import LoginGoogle from "./LoginGoogle";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
+import LoginGoogle from "../components/LoginGoogle";
+import Navbar from "../components/UserNavbar";
+import Footer from "../components/Footer";
 
 export default function Login() {
   const { setRefresh, setIsLogin, setMe } = useContext(AppContext);
