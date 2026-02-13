@@ -4,14 +4,17 @@ import AppContext from "../components/AppContext";
 import logo from "../../assets/Logo.png";
 import "../style/Admin.css";
 
-export default function AdminLayout() {
+export default function HomeAdmin() {
   const navigate = useNavigate();
   const { isLoading, isLogin, isAdmin, me } = useContext(AppContext);
   useEffect(() => {
     if (!isLoading) {
       if (!isLogin || me?.roles !== "admin") navigate("/");
-    } else navigate("/");
+    }
   }, [isLoading, isLogin, me, navigate]);
+  if (isLoading) {
+    return <div>Bạn ko có quyền vào trang này</div>;
+  }
   return (
     <div className="admin-wrapper">
       <aside className="admin-sidebar">

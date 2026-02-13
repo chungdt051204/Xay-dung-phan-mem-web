@@ -37,7 +37,7 @@ export default function Login() {
         setMe(data);
         toast.success(message);
         setTimeout(() => {
-          data.roles === "admin" ? navigate("/admin") : navigate("/");
+          navigate("/");
         }, 1000);
         setRefresh((p) => p + 1);
       })
@@ -57,12 +57,17 @@ export default function Login() {
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Tên đăng nhập / Email</label>
-              <input ref={input} required />
+              <input ref={input} required autoComplete="off" />
             </div>
 
             <div className="form-group">
               <label>Mật khẩu</label>
-              <input type="password" ref={password} required />
+              <input
+                type="password"
+                ref={password}
+                required
+                autoComplete="new-password"
+              />
             </div>
 
             {err && <p className="error">{err}</p>}
