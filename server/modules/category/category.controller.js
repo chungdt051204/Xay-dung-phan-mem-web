@@ -31,14 +31,11 @@ exports.createCategory = async (req, res) => {
 exports.updateCategory = async (req, res) => {
   try {
     const { id, categoryName } = req.body;
-    const updatedCategory = await categoryEntity.findByIdAndUpdate(
-      id,
-      { categoryName },
-      { new: true }
-    );
+    await categoryEntity.findByIdAndUpdate(id, {
+      categoryName,
+    });
     return res.status(200).json({
       message: "Cập nhật danh mục thành công",
-      category: updatedCategory,
     });
   } catch (error) {
     return res

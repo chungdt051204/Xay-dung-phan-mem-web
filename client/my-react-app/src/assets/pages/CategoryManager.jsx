@@ -1,19 +1,48 @@
-import { useContext, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useContext, useEffect, useRef, useState } from "react";
 import AppContext from "../components/AppContext";
 import { toast } from "react-toastify";
+import fetchApi from "../../service/api";
 export default function CategoryManager() {
   const { categories, setRefresh } = useContext(AppContext);
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const params = new URLSearchParams(searchParams);
+  const id = searchParams.get("id");
+  const [categoryWithId, setCategoryWithId] = useState("");
   const [categoryName, setCategoryName] = useState("");
-  const [categoryIdEdit, setCategoryIdEdit] = useState("");
+  const [isEdit, setIsEdit] = useState(false);
+  const formDialog = useRef();
+  useEffect(() => {
+    if (id) {
+      setIsEdit(true);
+      fetchApi({
+        url: `http://localhost:3000/category?id=${id}`,
+        setData: setCategoryWithId,
+      });
+    } else {
+      setIsEdit(false);
+      setCategoryName("");
+    }
+  }, [id]);
+  useEffect(() => {
+    if (categoryWithId) {
+      setCategoryName(categoryWithId?.categoryName);
+      formDialog.current.showModal();
+    }
+  }, [categoryWithId]);
 
-  const handleRow = (id, name) => {
-    setCategoryIdEdit(id);
-    setCategoryName(name);
+  const handleOpenDialog = (id) => {
+    setIsEdit(true);
+    params.set("id", id);
+    navigate(`?${params.toString()}`);
+    formDialog.current.showModal();
   };
 
-  const handleUpdateCategory = () => {
-    if (!categoryIdEdit || !categoryName) {
-      toast.error("Vui lòng chọn danh mục và nhập tên danh mục");
+  const handleUpdateCategory = (e) => {
+    e.preventDefault();
+    if (!categoryName) {
+      toast.error("Vui lòng nhập tên danh mục");
       return;
     }
     fetch(`http://localhost:3000/category`, {
@@ -22,21 +51,26 @@ export default function CategoryManager() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.token}`,
       },
-      body: JSON.stringify({ id: categoryIdEdit, categoryName: categoryName }),
+      body: JSON.stringify({ id: id, categoryName: categoryName }),
     })
       .then((res) => {
-        if (res.ok) {
-          setRefresh((prev) => prev + 1);
-          setCategoryIdEdit("");
-          setCategoryName("");
-          toast.success("Cập nhật danh mục thành công");
-        } else {
-          toast.error("Không thể cập nhật danh mục: " + res.statusText);
-        }
+        if (res.ok) return res.json();
+        throw res;
       })
-      .catch((error) => {
-        console.error("Không thể cập nhật danh mục :", error);
-        toast.error("Không thể cập nhật danh mục : " + error.message);
+      .then(({ message }) => {
+        toast.success(message);
+        setCategoryName("");
+        setSearchParams((prev) => {
+          const newParams = new URLSearchParams(prev);
+          if (newParams.has("id")) newParams.delete("id");
+          return newParams;
+        });
+        formDialog.current.close();
+        setRefresh((prev) => prev + 1);
+      })
+      .catch(async (err) => {
+        const { message } = await err.json();
+        console.log(message);
       });
   };
 
@@ -61,7 +95,8 @@ export default function CategoryManager() {
       });
   };
 
-  const handleCreateCategory = () => {
+  const handleCreateCategory = (e) => {
+    e.preventDefault();
     if (!categoryName) {
       toast.error("Tên danh mục không được để trống");
       return;
@@ -81,6 +116,12 @@ export default function CategoryManager() {
       .then(({ message }) => {
         toast.success(message);
         setCategoryName("");
+        setSearchParams((prev) => {
+          const newParams = new URLSearchParams(prev);
+          if (newParams.has("id")) newParams.delete("id");
+          return newParams;
+        });
+        formDialog.current.close();
         setRefresh((prev) => prev + 1);
       })
       .catch(async (err) => {
@@ -92,31 +133,43 @@ export default function CategoryManager() {
   return (
     <div className="page-box">
       <h2>Quản lý loại sản phẩm</h2>
-      <h2>Form</h2>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleCreateCategory();
+      <button
+        onClick={() => {
+          formDialog.current.showModal();
         }}
       >
-        <input
-          type="text"
-          placeholder="Tên danh mục"
-          value={categoryName}
-          onChange={(e) => setCategoryName(e.target.value)}
-          required
-        />
-        <button type="submit" onClick={handleCreateCategory}>
-          Thêm
-        </button>
-        <button type="submit" onClick={handleUpdateCategory}>
-          Sửa
-        </button>
-      </form>
+        Thêm loại
+      </button>
+      <dialog ref={formDialog}>
+        <h2>{isEdit ? "Cập nhật loại sản phẩm" : "Thêm loại sản phẩm"}</h2>
+        <form onSubmit={isEdit ? handleUpdateCategory : handleCreateCategory}>
+          <input
+            type="text"
+            placeholder="Tên danh mục"
+            value={categoryName}
+            onChange={(e) => setCategoryName(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setSearchParams((prev) => {
+                const newParams = new URLSearchParams(prev);
+                if (newParams.has("id")) newParams.delete("id");
+                return newParams;
+              });
+              formDialog.current.close();
+            }}
+          >
+            Hủy
+          </button>
+          <button>Lưu</button>
+        </form>
+      </dialog>
+
       <table>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Tên danh mục</th>
             <th>Hành động</th>
           </tr>
@@ -124,13 +177,10 @@ export default function CategoryManager() {
         <tbody>
           {categories.map((category) => (
             <tr key={category._id}>
-              <td>{category._id}</td>
               <td>{category.categoryName}</td>
               <td>
                 <button onClick={() => handleDelete(category._id)}>Xóa</button>
-                <button
-                  onClick={() => handleRow(category._id, category.categoryName)}
-                >
+                <button onClick={() => handleOpenDialog(category._id)}>
                   Sửa
                 </button>
               </td>
