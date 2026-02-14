@@ -1,6 +1,7 @@
 import { useContext, useEffect } from "react";
-import { Outlet, Link, useNavigate } from "react-router-dom";
 import AppContext from "../components/AppContext";
+import { Outlet, useNavigate, Link } from "react-router-dom";
+
 import logo from "../../assets/Logo.png";
 import "../style/Admin.css";
 
@@ -98,7 +99,6 @@ export default function HomeAdmin() {
             />
           </div>
         </header>
-
         <section className="admin-page-content">
           <Outlet />
         </section>

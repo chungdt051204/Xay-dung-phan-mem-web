@@ -30,7 +30,7 @@ export default function CategoryManager() {
           setCategoryIdEdit("");
           setCategoryName("");
           toast.success("Cập nhật danh mục thành công");
-        }else{
+        } else {
           toast.error("Không thể cập nhật danh mục: " + res.statusText);
         }
       })
@@ -51,7 +51,7 @@ export default function CategoryManager() {
         if (res.ok) {
           setRefresh((prev) => prev + 1);
           toast.success("Xóa danh mục thành công");
-        }else{
+        } else {
           toast.error("Không thể xóa danh mục: " + res.statusText);
         }
       })
@@ -62,7 +62,7 @@ export default function CategoryManager() {
   };
 
   const handleCreateCategory = () => {
-    if(!categoryName){
+    if (!categoryName) {
       toast.error("Tên danh mục không được để trống");
       return;
     }
@@ -75,24 +75,24 @@ export default function CategoryManager() {
       body: JSON.stringify({ categoryName: categoryName }),
     })
       .then((res) => {
-        if (res.ok) {
-          setRefresh((prev) => prev + 1);
-          setCategoryName("");
-          toast.success("Tạo danh mục thành công");
-        }else{
-          toast.error("Không thể tạo danh mục: " + res.statusText);
-        }
+        if (res.ok) return res.json();
+        throw res;
       })
-      .catch((error) => {
-        console.error("Không thể tạo danh mục :", error);
-        toast.error("Không thể tạo danh mục : " + error.message);
+      .then(({ message }) => {
+        toast.success(message);
+        setCategoryName("");
+        setRefresh((prev) => prev + 1);
+      })
+      .catch(async (err) => {
+        const { message } = await err.json();
+        console.log(message);
       });
   };
 
   return (
     <div className="page-box">
       <h2>Quản lý loại sản phẩm</h2>
-       <h2>Form</h2>
+      <h2>Form</h2>
       <form
         onSubmit={(e) => {
           e.preventDefault();

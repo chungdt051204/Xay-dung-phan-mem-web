@@ -2,7 +2,7 @@
   display: flex;
   min-height: 100vh;
   background-color: #fcfcfc;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .admin-sidebar {
@@ -32,7 +32,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: linear-gradient(135deg, #F87171 0%, #EF4444 100%);
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
   padding: 15px;
   border-radius: 16px;
   margin-bottom: 30px;
@@ -94,17 +94,17 @@
 }
 
 .admin-nav a:hover {
-  background: #FEF2F2;
-  color: #EF4444;
+  background: #fef2f2;
+  color: #ef4444;
 }
 
 .admin-nav a.active {
-  background: #FEF2F2;
-  color: #EF4444;
+  background: #fef2f2;
+  color: #ef4444;
 }
 
 .admin-nav a.active i {
-  color: #EF4444;
+  color: #ef4444;
 }
 
 .admin-nav-bottom {
@@ -180,7 +180,7 @@
   right: 2px;
   width: 8px;
   height: 8px;
-  background: #EF4444;
+  background: #ef4444;
   border-radius: 50%;
   border: 2px solid white;
 }
@@ -196,16 +196,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #EF4444; 
-  padding: 10px 20px;       
-  border-radius: 12px;      
-  margin-bottom: 1.5rem;     
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+  background-color: #ef4444;
+  padding: 10px 20px;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .brand-logo-img {
-  height: 45px;            
-  width: auto;            
+  height: 45px;
+  width: auto;
   display: block;
   object-fit: contain;
 }

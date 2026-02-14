@@ -1,19 +1,50 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import AppContext from "../components/AppContext";
 import { toast } from "react-toastify";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import fetchApi from "../../service/api";
+import api from "../../App";
+
 export default function BrandManager() {
   const { brands, setRefresh } = useContext(AppContext);
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const params = new URLSearchParams(searchParams);
+  const id = searchParams.get("id");
   const [brandName, setBrandName] = useState("");
-  const [brandIdEdit, setBrandIdEdit] = useState("");
+  const [brandWithId, setBrandWithId] = useState("");
+  const [isEdit, setIsEdit] = useState(false);
+  const formDialog = useRef();
+  useEffect(() => {
+    if (id) {
+      setIsEdit(true);
+      fetchApi({
+        url: `http://localhost:3000/brand?id=${id}`,
+        setData: setBrandWithId,
+      });
+    } else {
+      setIsEdit(false);
+      setBrandName("");
+    }
+  }, [id]);
+  useEffect(() => {
+    if (brandWithId) {
+      setBrandName(brandWithId?.brandName);
+      formDialog.current.showModal();
+    }
+  }, [brandWithId]);
 
-  const handleRow = (id, name) => {
-    setBrandIdEdit(id);
-    setBrandName(name);
+  const handleOpenDialog = (id) => {
+    setIsEdit(true);
+    params.set("id", id);
+    navigate(`?${params.toString()}`);
+    formDialog.current.showModal();
   };
 
-  const handleUpdateBrand = () => {
-    if (!brandIdEdit || !brandName) {
-      toast.error("Vui lòng chọn thương hiệu và nhập tên thương hiệu");
+  const handleUpdateBrand = (e) => {
+    e.preventDefault();
+    if (!brandName) {
+      toast.error("Vui nhập tên thương hiệu");
       return;
     }
     fetch(`http://localhost:3000/brand`, {
@@ -22,21 +53,26 @@ export default function BrandManager() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.token}`,
       },
-      body: JSON.stringify({ id: brandIdEdit, brandName: brandName }),
+      body: JSON.stringify({ id: id, brandName: brandName }),
     })
       .then((res) => {
-        if (res.ok) {
-          setRefresh((prev) => prev + 1);
-          setBrandIdEdit("");
-          setBrandName("");
-          toast.success("Cập nhật thương hiệu thành công");
-        }else{
-          toast.error("Không thể cập nhật thương hiệu: " + res.statusText);
-        }
+        if (res.ok) return res.json();
+        throw res;
       })
-      .catch((error) => {
-        console.error("Không thể cập nhật thương hiệu :", error);
-        toast.error("Không thể cập nhật thương hiệu : " + error.message);
+      .then(({ message }) => {
+        toast.success(message);
+        setBrandName("");
+        setSearchParams((prev) => {
+          const newParams = new URLSearchParams(prev);
+          if (newParams.has("id")) newParams.delete("id");
+          return newParams;
+        });
+        formDialog.current.close();
+        setRefresh((prev) => prev + 1);
+      })
+      .catch(async (err) => {
+        const { message } = await err.json();
+        console.log(message);
       });
   };
 
@@ -51,7 +87,7 @@ export default function BrandManager() {
         if (res.ok) {
           setRefresh((prev) => prev + 1);
           toast.success("Xóa thương hiệu thành công");
-        }else{
+        } else {
           toast.error("Không thể xóa thương hiệu: " + res.statusText);
         }
       })
@@ -61,8 +97,9 @@ export default function BrandManager() {
       });
   };
 
-  const handleCreateBrand = () => {
-    if(!brandName){
+  const handleCreateBrand = (e) => {
+    e.preventDefault();
+    if (!brandName) {
       toast.error("Tên thương hiệu không được để trống");
       return;
     }
@@ -75,47 +112,61 @@ export default function BrandManager() {
       body: JSON.stringify({ brandName: brandName }),
     })
       .then((res) => {
-        if (res.ok) {
-          setRefresh((prev) => prev + 1);
-          setBrandName("");
-          toast.success("Tạo thương hiệu thành công");
-        }else{
-          toast.error("Không thể tạo thương hiệu: " + res.statusText);
-        }
+        if (res.ok) return res.json();
+        throw res;
       })
-      .catch((error) => {
-        console.error("Không thể tạo thương hiệu :", error);
-        toast.error("Không thể tạo thương hiệu : " + error.message);
+      .then(({ message }) => {
+        toast.success(message);
+        setBrandName("");
+        formDialog.current.close();
+        setRefresh((prev) => prev + 1);
+      })
+      .catch(async (err) => {
+        const { message } = await err.json();
+        console.log(message);
       });
   };
 
   return (
     <div className="page-box">
       <h2>Quản lý thương hiệu</h2>
-      <h2>Form</h2>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
+      <button
+        onClick={() => {
+          formDialog.current.showModal();
         }}
       >
-        <input
-          type="text"
-          placeholder="Tên thương hiệu"
-          value={brandName}
-          onChange={(e) => setBrandName(e.target.value)}
-          required
-        />
-        <button type="submit" onClick={handleCreateBrand}>
-          Thêm
-        </button>
-        <button type="submit" onClick={handleUpdateBrand}>
-          Sửa
-        </button>
-      </form>
+        Thêm thương hiệu
+      </button>
+      <dialog ref={formDialog}>
+        <h2>{isEdit ? "Cập nhật thương hiệu" : "Thêm thương hiệu"}</h2>
+        <form onSubmit={isEdit ? handleUpdateBrand : handleCreateBrand}>
+          <input
+            type="text"
+            placeholder="Tên thương hiệu"
+            value={brandName}
+            onChange={(e) => setBrandName(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setSearchParams((prev) => {
+                const newParams = new URLSearchParams(prev);
+                if (newParams.has("id")) newParams.delete("id");
+                return newParams;
+              });
+              formDialog.current.close();
+            }}
+          >
+            Hủy
+          </button>
+          <button>Lưu</button>
+        </form>
+      </dialog>
+
       <table>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Tên thương hiệu</th>
             <th>Hành động</th>
           </tr>
@@ -123,13 +174,10 @@ export default function BrandManager() {
         <tbody>
           {brands.map((brand) => (
             <tr key={brand._id}>
-              <td>{brand._id}</td>
               <td>{brand.brandName}</td>
               <td>
                 <button onClick={() => handleDelete(brand._id)}>Xóa</button>
-                <button onClick={() => handleRow(brand._id, brand.brandName)}>
-                  Sửa
-                </button>
+                <button onClick={() => handleOpenDialog(brand._id)}>Sửa</button>
               </td>
             </tr>
           ))}
