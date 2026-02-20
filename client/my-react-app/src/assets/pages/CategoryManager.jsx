@@ -3,6 +3,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import AppContext from "../components/AppContext";
 import { toast } from "react-toastify";
 import fetchApi from "../../service/api";
+import ConfirmDialog from "../components/ConfirmDialog";
 export default function CategoryManager() {
   const { categories, setRefresh } = useContext(AppContext);
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ export default function CategoryManager() {
   const [categoryName, setCategoryName] = useState("");
   const [isEdit, setIsEdit] = useState(false);
   const formDialog = useRef();
+  const confirmDialog = useRef();
   useEffect(() => {
     if (id) {
       setIsEdit(true);
@@ -26,11 +28,11 @@ export default function CategoryManager() {
     }
   }, [id]);
   useEffect(() => {
-    if (categoryWithId) {
+    if (categoryWithId && id) {
       setCategoryName(categoryWithId?.categoryName);
       formDialog.current.showModal();
     }
-  }, [categoryWithId]);
+  }, [categoryWithId, id]);
 
   const handleOpenDialog = (id) => {
     setIsEdit(true);
@@ -38,7 +40,13 @@ export default function CategoryManager() {
     navigate(`?${params.toString()}`);
     formDialog.current.showModal();
   };
-
+  const handleOpenConfirmDialog = (id) => {
+    fetchApi({
+      url: `http://localhost:3000/category?id=${id}`,
+      setData: setCategoryWithId,
+    });
+    confirmDialog.current.showModal();
+  };
   const handleUpdateCategory = (e) => {
     e.preventDefault();
     if (!categoryName) {
@@ -74,8 +82,8 @@ export default function CategoryManager() {
       });
   };
 
-  const handleDelete = (id) => {
-    fetch(`http://localhost:3000/category/${id}`, {
+  const handleDelete = () => {
+    fetch(`http://localhost:3000/category/${categoryWithId._id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${localStorage.token}`,
@@ -83,8 +91,9 @@ export default function CategoryManager() {
     })
       .then((res) => {
         if (res.ok) {
-          setRefresh((prev) => prev + 1);
           toast.success("Xóa danh mục thành công");
+          confirmDialog.current.close();
+          setRefresh((prev) => prev + 1);
         } else {
           toast.error("Không thể xóa danh mục: " + res.statusText);
         }
@@ -179,7 +188,9 @@ export default function CategoryManager() {
             <tr key={category._id}>
               <td>{category.categoryName}</td>
               <td>
-                <button onClick={() => handleDelete(category._id)}>Xóa</button>
+                <button onClick={() => handleOpenConfirmDialog(category._id)}>
+                  Xóa
+                </button>
                 <button onClick={() => handleOpenDialog(category._id)}>
                   Sửa
                 </button>
@@ -188,6 +199,11 @@ export default function CategoryManager() {
           ))}
         </tbody>
       </table>
+      <ConfirmDialog
+        ref={confirmDialog}
+        content="Bạn có muốn xóa loại sản phẩm này không ?"
+        handleClick={handleDelete}
+      />
     </div>
   );
 }

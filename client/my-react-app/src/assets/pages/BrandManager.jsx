@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import fetchApi from "../../service/api";
 import api from "../../App";
+import ConfirmDialog from "../components/ConfirmDialog";
 
 export default function BrandManager() {
   const { brands, setRefresh } = useContext(AppContext);
@@ -15,6 +16,7 @@ export default function BrandManager() {
   const [brandWithId, setBrandWithId] = useState("");
   const [isEdit, setIsEdit] = useState(false);
   const formDialog = useRef();
+  const confirmDialog = useRef();
   useEffect(() => {
     if (id) {
       setIsEdit(true);
@@ -28,11 +30,11 @@ export default function BrandManager() {
     }
   }, [id]);
   useEffect(() => {
-    if (brandWithId) {
+    if (brandWithId && id) {
       setBrandName(brandWithId?.brandName);
       formDialog.current.showModal();
     }
-  }, [brandWithId]);
+  }, [brandWithId, id]);
 
   const handleOpenDialog = (id) => {
     setIsEdit(true);
@@ -40,7 +42,13 @@ export default function BrandManager() {
     navigate(`?${params.toString()}`);
     formDialog.current.showModal();
   };
-
+  const handleOpenConfirmDialog = (id) => {
+    fetchApi({
+      url: `http://localhost:3000/brand?id=${id}`,
+      setData: setBrandWithId,
+    });
+    confirmDialog.current.showModal();
+  };
   const handleUpdateBrand = (e) => {
     e.preventDefault();
     if (!brandName) {
@@ -76,8 +84,8 @@ export default function BrandManager() {
       });
   };
 
-  const handleDelete = (id) => {
-    fetch(`http://localhost:3000/brand/${id}`, {
+  const handleDelete = () => {
+    fetch(`http://localhost:3000/brand/${brandWithId._id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${localStorage.token}`,
@@ -85,8 +93,9 @@ export default function BrandManager() {
     })
       .then((res) => {
         if (res.ok) {
-          setRefresh((prev) => prev + 1);
           toast.success("Xóa thương hiệu thành công");
+          confirmDialog.current.close();
+          setRefresh((prev) => prev + 1);
         } else {
           toast.error("Không thể xóa thương hiệu: " + res.statusText);
         }
@@ -176,13 +185,20 @@ export default function BrandManager() {
             <tr key={brand._id}>
               <td>{brand.brandName}</td>
               <td>
-                <button onClick={() => handleDelete(brand._id)}>Xóa</button>
+                <button onClick={() => handleOpenConfirmDialog(brand._id)}>
+                  Xóa
+                </button>
                 <button onClick={() => handleOpenDialog(brand._id)}>Sửa</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <ConfirmDialog
+        ref={confirmDialog}
+        content="Bạn có muốn xóa thương hiệu này không ?"
+        handleClick={handleDelete}
+      />
     </div>
   );
 }
