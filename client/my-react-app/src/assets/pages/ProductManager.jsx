@@ -1,6 +1,7 @@
 import { useContext, useRef, useState } from "react";
 import AppContext from "../components/AppContext";
 import { toast } from "react-toastify";
+import { api } from "../../App";
 export default function ProductManager() {
   const { products, brands, categories, setRefresh } = useContext(AppContext);
   const [productName, setProductName] = useState("");
@@ -67,7 +68,7 @@ export default function ProductManager() {
       .split(",")
       .map((img) => img.trim())
       .filter((img) => img !== "");
-    fetch(`http://localhost:3000/product`, {
+    fetch(`${api}/product`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -104,7 +105,7 @@ export default function ProductManager() {
   };
 
   const handleDelete = (id) => {
-    fetch(`http://localhost:3000/product/${id}`, {
+    fetch(`${api}/product/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${localStorage.token}`,
@@ -147,7 +148,7 @@ export default function ProductManager() {
       .split(",")
       .map((c) => c.trim())
       .filter((c) => c !== "");
-    fetch(`http://localhost:3000/product`, {
+    fetch(`${api}/product`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

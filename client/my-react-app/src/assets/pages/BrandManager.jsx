@@ -3,7 +3,7 @@ import AppContext from "../components/AppContext";
 import { toast } from "react-toastify";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import fetchApi from "../../service/api";
-import api from "../../App";
+import { api } from "../../App";
 import ConfirmDialog from "../components/ConfirmDialog";
 
 export default function BrandManager() {
@@ -21,7 +21,7 @@ export default function BrandManager() {
     if (id) {
       setIsEdit(true);
       fetchApi({
-        url: `http://localhost:3000/brand?id=${id}`,
+        url: `${api}/brand?id=${id}`,
         setData: setBrandWithId,
       });
     } else {
@@ -44,7 +44,7 @@ export default function BrandManager() {
   };
   const handleOpenConfirmDialog = (id) => {
     fetchApi({
-      url: `http://localhost:3000/brand?id=${id}`,
+      url: `${api}/brand?id=${id}`,
       setData: setBrandWithId,
     });
     confirmDialog.current.showModal();
@@ -55,7 +55,7 @@ export default function BrandManager() {
       toast.error("Vui nhập tên thương hiệu");
       return;
     }
-    fetch(`http://localhost:3000/brand`, {
+    fetch(`${api}/brand`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -85,24 +85,26 @@ export default function BrandManager() {
   };
 
   const handleDelete = () => {
-    fetch(`http://localhost:3000/brand/${brandWithId._id}`, {
+    fetch(`${api}/brand/${brandWithId._id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${localStorage.token}`,
       },
     })
       .then((res) => {
-        if (res.ok) {
-          toast.success("Xóa thương hiệu thành công");
-          confirmDialog.current.close();
-          setRefresh((prev) => prev + 1);
-        } else {
-          toast.error("Không thể xóa thương hiệu: " + res.statusText);
-        }
+        if (res.ok) return res.json();
+        throw res;
       })
-      .catch((error) => {
-        console.error("Không thể xóa thương hiệu :", error);
-        toast.error("Không thể xóa thương hiệu : " + error.message);
+      .then(({ message }) => {
+        toast.success(message);
+        confirmDialog.current.close();
+        setRefresh((prev) => prev + 1);
+      })
+      .catch(async (error) => {
+        if (error.status === 400) {
+          const { message } = await error.json();
+          toast.error(message);
+        }
       });
   };
 
@@ -112,7 +114,7 @@ export default function BrandManager() {
       toast.error("Tên thương hiệu không được để trống");
       return;
     }
-    fetch(`http://localhost:3000/brand`, {
+    fetch(`${api}/brand`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
