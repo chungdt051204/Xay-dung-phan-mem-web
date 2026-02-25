@@ -14,7 +14,9 @@ import UserManager from "./assets/pages/UserManager";
 import OrderManager from "./assets/pages/OrderManager";
 import Password from "./assets/pages/Password";
 import Confirm from "./assets/pages/Confirm";
+import DetailProduct from "./assets/pages/DetailProduct";
 import fetchApi from "./service/api";
+
 
 export const api = "http://localhost:3000";
 
@@ -94,6 +96,7 @@ function App() {
         <Route path="/password" element={<Password />} />
         <Route path="/confirm" element={<Confirm />} />
         <Route path="/access-denied" element={<AccessDeniedPage />} />
+        <Route path="product/detail" element={<DetailProduct />} />
         {/* Routes cho phía Admin  */}
         <Route path="/admin" element={<HomeAdmin />}>
           <Route path="brands" element={<BrandManager />} />{" "}
