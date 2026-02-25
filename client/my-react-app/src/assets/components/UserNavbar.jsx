@@ -73,10 +73,10 @@ export default function UserNavbar() {
       </div>
 
       <div className="navbar-right">
-        <div className="navbar-item">
+        <Link to="/cart" className="navbar-item cart-link">
           <i className="fa-solid fa-cart-shopping"></i>
           <span>Giỏ hàng</span>
-        </div>
+        </Link>
 
         {isLogin && me ? (
           <div className="user-menu-wrapper" ref={userMenuRef}>

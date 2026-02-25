@@ -13,6 +13,7 @@ import UserManager from "./assets/pages/UserManager";
 import OrderManager from "./assets/pages/OrderManager";
 import Password from "./assets/pages/Password";
 import Confirm from "./assets/pages/Confirm";
+import Cart from "./assets/components/Cart"; // cart page/component
 import fetchApi from "./service/api";
 
 export const api = "http://localhost:3000";
@@ -82,6 +83,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/password" element={<Password />} />
         <Route path="/confirm" element={<Confirm />} />
+        <Route path="/cart" element={<Cart />} />
         {/* Routes cho phía Admin  */}
         <Route path="/admin" element={<HomeAdmin />}>
           <Route path="brands" element={<BrandManager />} />{" "}
