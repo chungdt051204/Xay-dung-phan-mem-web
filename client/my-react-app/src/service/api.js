@@ -5,7 +5,6 @@ const fetchApi = ({ url, setData }) => {
       throw res;
     })
     .then(({ result }) => {
-      console.log(result);
       setData(result);
     })
     .catch(async (err) => {

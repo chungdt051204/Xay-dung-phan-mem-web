@@ -5,8 +5,6 @@ import { toast } from "react-toastify";
 import { api } from "../../App";
 import "../style/Auth.css";
 import LoginGoogle from "../components/LoginGoogle";
-import Navbar from "../components/UserNavbar";
-import Footer from "../components/Footer";
 
 export default function Login() {
   const { setRefresh, setIsLogin, setMe } = useContext(AppContext);
@@ -49,7 +47,6 @@ export default function Login() {
 
   return (
     <>
-      <Navbar />
       <div className="auth-wrapper">
         <div className="auth-card auth-card--login">
           <h2>ĐĂNG NHẬP</h2>
@@ -86,7 +83,6 @@ export default function Login() {
           </form>
         </div>
       </div>
-      <Footer />
     </>
   );
 }

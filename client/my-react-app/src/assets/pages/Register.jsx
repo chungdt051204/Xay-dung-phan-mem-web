@@ -5,8 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { api } from "../../App";
 import { toast } from "react-toastify";
-import Navbar from "../components/UserNavbar";
-import Footer from "../components/Footer";
 import "../style/Auth.css";
 
 export default function Register() {
@@ -101,7 +99,6 @@ export default function Register() {
 
   return (
     <>
-      <Navbar />
       <div className="auth-wrapper">
         <div className="auth-card">
           <h2>ĐĂNG KÝ</h2>
@@ -184,7 +181,6 @@ export default function Register() {
           </form>
         </div>
       </div>
-      <Footer />
     </>
   );
 }
