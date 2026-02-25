@@ -5,6 +5,7 @@ import AppContext from "./assets/components/AppContext";
 import HomeUser from "./assets/pages/HomeUser";
 import Login from "./assets/pages/Login";
 import Register from "./assets/pages/Register";
+import AccessDeniedPage from "./assets/pages/AccessDeniedPage";
 import HomeAdmin from "./assets/pages/HomeAdmin";
 import BrandManager from "./assets/pages/BrandManager";
 import CategoryManager from "./assets/pages/CategoryManager";
@@ -92,6 +93,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/password" element={<Password />} />
         <Route path="/confirm" element={<Confirm />} />
+        <Route path="/access-denied" element={<AccessDeniedPage />} />
         {/* Routes cho phía Admin  */}
         <Route path="/admin" element={<HomeAdmin />}>
           <Route path="brands" element={<BrandManager />} />{" "}

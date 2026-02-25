@@ -2,6 +2,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useContext, useEffect, useRef, useState } from "react";
 import AppContext from "../components/AppContext";
 import { toast } from "react-toastify";
+import { api } from "../../App";
 import fetchApi from "../../service/api";
 import ConfirmDialog from "../components/ConfirmDialog";
 export default function CategoryManager() {
@@ -19,7 +20,7 @@ export default function CategoryManager() {
     if (id) {
       setIsEdit(true);
       fetchApi({
-        url: `http://localhost:3000/category?id=${id}`,
+        url: `${api}/category?id=${id}`,
         setData: setCategoryWithId,
       });
     } else {
@@ -42,7 +43,7 @@ export default function CategoryManager() {
   };
   const handleOpenConfirmDialog = (id) => {
     fetchApi({
-      url: `http://localhost:3000/category?id=${id}`,
+      url: `${api}/category?id=${id}`,
       setData: setCategoryWithId,
     });
     confirmDialog.current.showModal();
@@ -53,7 +54,7 @@ export default function CategoryManager() {
       toast.error("Vui lòng nhập tên danh mục");
       return;
     }
-    fetch(`http://localhost:3000/category`, {
+    fetch(`${api}/category`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -83,24 +84,26 @@ export default function CategoryManager() {
   };
 
   const handleDelete = () => {
-    fetch(`http://localhost:3000/category/${categoryWithId._id}`, {
+    fetch(`${api}/category/${categoryWithId._id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${localStorage.token}`,
       },
     })
       .then((res) => {
-        if (res.ok) {
-          toast.success("Xóa danh mục thành công");
-          confirmDialog.current.close();
-          setRefresh((prev) => prev + 1);
-        } else {
-          toast.error("Không thể xóa danh mục: " + res.statusText);
-        }
+        if (res.ok) return res.json();
+        throw res;
       })
-      .catch((error) => {
-        console.error("Không thể xóa danh mục :", error);
-        toast.error("Không thể xóa danh mục : " + error.message);
+      .then(({ message }) => {
+        toast.success(message);
+        confirmDialog.current.close();
+        setRefresh((prev) => prev + 1);
+      })
+      .catch(async (error) => {
+        if (error.status === 400) {
+          const { message } = await error.json();
+          toast.error(message);
+        }
       });
   };
 
@@ -110,7 +113,7 @@ export default function CategoryManager() {
       toast.error("Tên danh mục không được để trống");
       return;
     }
-    fetch(`http://localhost:3000/category`, {
+    fetch(`${api}/category`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

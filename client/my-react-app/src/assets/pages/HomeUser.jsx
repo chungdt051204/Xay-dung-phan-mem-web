@@ -18,7 +18,7 @@ export default function HomeUser() {
     (value) => value.categoryId.categoryName === "Máy tính bảng"
   );
   const headphones = products?.docs?.filter(
-    (value) => value.categoryId.categoryName === "Headphones"
+    (value) => value.categoryId.categoryName === "Headphone"
   );
   const televisions = products?.docs?.filter(
     (value) => value.categoryId.categoryName === "TV"
