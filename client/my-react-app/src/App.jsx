@@ -14,7 +14,7 @@ import OrderManager from "./assets/pages/OrderManager";
 import Password from "./assets/pages/Password";
 import Confirm from "./assets/pages/Confirm";
 import DetailProduct from "./assets/pages/DetailProduct";
-import Cart from "./assets/components/Cart"; // cart page/component
+import Cart from "./assets/pages/Cart"; // cart page/component
 import fetchApi from "./service/api";
 
 export const api = "http://localhost:3000";

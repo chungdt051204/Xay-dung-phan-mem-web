@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { useSearchParams } from "react-router-dom";
 import AppContext from "../components/AppContext";
+import { api } from "../../App";
 import fetchApi from "../../service/api";
 import Navbar from "../components/UserNavbar";
 import Footer from "../components/Footer";
@@ -19,14 +20,14 @@ export default function DetailProduct() {
     if (!productId) return;
 
     fetchApi({
-      url: `http://localhost:3000/product?productId=${productId}`,
+      url: `${api}/product?productId=${productId}`,
       setData: setData,
     });
   }, [productId]);
   const handleAddCart = () => {
     if (!isLogin) toast.warning("Bạn chưa đăng nhập !!");
     else {
-      fetch("http://localhost:3000/cart", {
+      fetch(`${api}/cart`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
