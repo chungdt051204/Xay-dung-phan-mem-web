@@ -1,31 +1,56 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useSearchParams } from "react-router-dom";
+import AppContext from "../components/AppContext";
 import fetchApi from "../../service/api";
 import Navbar from "../components/UserNavbar";
 import Footer from "../components/Footer";
 import "../style/DetailProduct.css";
+import { toast } from "react-toastify";
 
 export default function DetailProduct() {
+  const { isLogin, me, refresh, setRefresh } = useContext(AppContext);
   const [searchParams] = useSearchParams();
   const productId = searchParams.get("productId");
 
   const [data, setData] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
-  const [selectedVersion, setSelectedVersion] = useState("256GB");
-  const [selectedColor, setSelectedColor] = useState("Đen");
-
   useEffect(() => {
     if (!productId) return;
 
     fetchApi({
       url: `http://localhost:3000/product?productId=${productId}`,
-      setData: (result) => {
-        const product = Array.isArray(result) ? result[0] : result;
-        setData(product);
-      },
+      setData: setData,
     });
   }, [productId]);
+  const handleAddCart = () => {
+    if (!isLogin) toast.warning("Bạn chưa đăng nhập !!");
+    else {
+      fetch("http://localhost:3000/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: me?._id,
+          productId: data?._id,
+          quantity: quantity,
+        }),
+      })
+        .then((res) => {
+          if (res.ok) return res.json();
+          throw res;
+        })
+        .then(({ message }) => {
+          toast.success(message);
+          setRefresh((prev) => prev + 1);
+        })
+        .catch(async (err) => {
+          const { message } = await err.json();
+          console.log(message);
+        });
+    }
+  };
 
   if (!data) {
     return <div className="detail-container">Đang tải sản phẩm...</div>;
@@ -34,8 +59,6 @@ export default function DetailProduct() {
   const discountPercent = data.oldPrice
     ? Math.round(((data.oldPrice - data.price) / data.oldPrice) * 100)
     : 0;
-
-  const totalPrice = data.price * quantity;
 
   return (
     <>
@@ -68,38 +91,6 @@ export default function DetailProduct() {
               )}
             </div>
 
-            {/* VERSION */}
-            <div className="option-title">Phiên bản</div>
-            <div className="option-list">
-              {["256GB", "512GB", "1TB"].map((ver) => (
-                <div
-                  key={ver}
-                  className={`option-item ${
-                    selectedVersion === ver ? "active" : ""
-                  }`}
-                  onClick={() => setSelectedVersion(ver)}
-                >
-                  {ver}
-                </div>
-              ))}
-            </div>
-
-            {/* COLOR */}
-            <div className="option-title">Màu sắc</div>
-            <div className="option-list">
-              {["Đen", "Trắng", "Xanh"].map((color) => (
-                <div
-                  key={color}
-                  className={`option-item ${
-                    selectedColor === color ? "active" : ""
-                  }`}
-                  onClick={() => setSelectedColor(color)}
-                >
-                  {color}
-                </div>
-              ))}
-            </div>
-
             {/* Quantity */}
             <div className="quantity-box">
               <button onClick={() => quantity > 1 && setQuantity(quantity - 1)}>
@@ -109,13 +100,10 @@ export default function DetailProduct() {
               <button onClick={() => setQuantity(quantity + 1)}>+</button>
             </div>
 
-            <div className="total-price">
-              Tạm tính: {totalPrice.toLocaleString("vi-VN")}₫
-            </div>
-
             <div className="button-group">
-              <button className="btn-buy">MUA NGAY</button>
-              <button className="btn-cart">Thêm vào giỏ</button>
+              <button onClick={handleAddCart} className="btn-cart">
+                Thêm vào giỏ
+              </button>
             </div>
           </div>
         </div>
@@ -138,7 +126,7 @@ export default function DetailProduct() {
 
               <tr>
                 <td>Số lượng tồn kho</td>
-                <td>{data.quantityStock} sản phẩm</td>
+                <td>xxx sản phẩm</td>
               </tr>
 
               <tr>

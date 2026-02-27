@@ -19,6 +19,7 @@ const userRouter = require("./modules/user/user.router");
 const productRouter = require("./modules/product/product.router");
 const brandRouter = require("./modules/brand/brand.router");
 const categoryRouter = require("./modules/category/category.router");
+const cartRouter = require("./modules/cart/cart.router");
 const orderRouter = require("./modules/order/order.router");
 const orderItemsRouter = require("./modules/order_items/order_items.router");
 app.use(express.json());
@@ -27,6 +28,7 @@ app.use("/", userRouter);
 app.use("/", productRouter);
 app.use("/", brandRouter);
 app.use("/", categoryRouter);
+app.use("/", cartRouter);
 app.use("/", orderRouter);
 app.use("/", orderItemsRouter);
 //Xử lý đăng nhập google
