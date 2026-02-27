@@ -5,7 +5,6 @@ import AppContext from "./assets/components/AppContext";
 import HomeUser from "./assets/pages/HomeUser";
 import Login from "./assets/pages/Login";
 import Register from "./assets/pages/Register";
-import AccessDeniedPage from "./assets/pages/AccessDeniedPage";
 import HomeAdmin from "./assets/pages/HomeAdmin";
 import BrandManager from "./assets/pages/BrandManager";
 import CategoryManager from "./assets/pages/CategoryManager";
@@ -14,9 +13,8 @@ import UserManager from "./assets/pages/UserManager";
 import OrderManager from "./assets/pages/OrderManager";
 import Password from "./assets/pages/Password";
 import Confirm from "./assets/pages/Confirm";
-import DetailProduct from "./assets/pages/DetailProduct";
+import Cart from "./assets/components/Cart"; // cart page/component
 import fetchApi from "./service/api";
-
 
 export const api = "http://localhost:3000";
 
@@ -28,9 +26,6 @@ function App() {
   const [me, setMe] = useState(null);
   const isAdmin = !isLoading && isLogin && me?.roles === "admin";
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [brands, setBrands] = useState([]);
-  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const token = searchParams.get("token");
@@ -65,9 +60,6 @@ function App() {
   }, [refresh, isLoading, searchParams, setSearchParams]);
   useEffect(() => {
     fetchApi({ url: `${api}/product`, setData: setProducts });
-    fetchApi({ url: `${api}/category`, setData: setCategories });
-    fetchApi({ url: `${api}/brand`, setData: setBrands });
-    fetchApi({ url: `${api}/user`, setData: setUsers });
   }, [refresh]);
 
   return (
@@ -82,10 +74,6 @@ function App() {
         setMe,
         isAdmin,
         products,
-        categories,
-        brands,
-        users,
-        setUsers,
       }}
     >
       <Routes>
@@ -95,8 +83,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/password" element={<Password />} />
         <Route path="/confirm" element={<Confirm />} />
-        <Route path="/access-denied" element={<AccessDeniedPage />} />
-        <Route path="product/detail" element={<DetailProduct />} />
+        <Route path="/cart" element={<Cart />} />
         {/* Routes cho phía Admin  */}
         <Route path="/admin" element={<HomeAdmin />}>
           <Route path="brands" element={<BrandManager />} />{" "}

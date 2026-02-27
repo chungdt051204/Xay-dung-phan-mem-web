@@ -92,6 +92,19 @@
   color: white;
 }
 
+/* link wrapper around cart icon */
+.cart-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: white;
+  text-decoration: none;
+}
+
+.cart-link:hover {
+  opacity: 0.85;
+}
+
 .navbar-item:hover {
   opacity: 0.85;
 }
