@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import AppContext from "../components/AppContext";
 import React from "react";
 import Navbar from "../components/UserNavbar";
@@ -15,6 +15,8 @@ export default function Cart() {
   const navigate = useNavigate();
   const [myCart, setMyCart] = useState(null);
   const [itemIdsSelected, setItemIdsSelected] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const formDialog = useRef();
 
   const totalAmount = () => {
     let sum = 0;
@@ -24,6 +26,13 @@ export default function Cart() {
           sum = sum + value.productId.price * value.quantity;
       });
     return sum;
+  };
+  const totalAmountSelectedItems = () => {
+    let sum = 0;
+    selectedItems?.forEach((value) => {
+      sum = sum + value.productId.price * value.quantity;
+    });
+    return sum + " " + "VNĐ";
   };
 
   useEffect(() => {
@@ -45,6 +54,12 @@ export default function Cart() {
       fetchApi({ url: `${api}/cart?userId=${me?._id}`, setData: setMyCart });
     }
   }, [me, refresh]);
+
+  useEffect(() => {
+    setSelectedItems(
+      myCart?.items.filter((value) => itemIdsSelected.includes(value._id)) || []
+    );
+  }, [itemIdsSelected, myCart]);
 
   const handleItemSelected = (id) => {
     if (!itemIdsSelected.includes(id))
@@ -145,6 +160,13 @@ export default function Cart() {
         });
     }
   };
+  const handleConfirmOrder = () => {
+    if (itemIdsSelected.length === 0) {
+      toast.warning("Vui lòng chọn sản phẩm để xác nhận thanh toán");
+      return;
+    }
+    formDialog.current.showModal();
+  };
   return (
     <>
       <Navbar />
@@ -223,11 +245,69 @@ export default function Cart() {
               </div>
 
               <h4>Tổng tiền: {totalAmount() + " " + "VNĐ"} </h4>
-              <button className="checkout-btn">Thanh toán </button>
+              <button onClick={handleConfirmOrder} className="checkout-btn">
+                Thanh toán{" "}
+              </button>
             </div>
           )}
         </div>
       </div>
+      <dialog ref={formDialog} style={{ width: "1000px" }}>
+        <h2>Xác nhận thanh toán</h2>
+        <form>
+          <table border={1} cellSpacing={0} style={{ width: "800px" }}>
+            <thead>
+              <tr>
+                <th>Sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Tổng tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              {selectedItems?.map((value) => {
+                return (
+                  <tr key={value._id}>
+                    <td>
+                      <img
+                        src={value.productId.image}
+                        alt=""
+                        width={80}
+                        height={100}
+                      />
+                      <p>{value.productId.productName}</p>
+                      <p>{value.productId.description}</p>
+                      <h6>{value.productId.techSpecs}</h6>
+                    </td>
+                    <td>{value.productId.price + " " + "VNĐ"} </td>
+                    <td>{value.quantity}</td>
+                    <td>
+                      {value.productId.price * value.quantity + " " + "VNĐ"}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <br />
+          <h2>Tổng tiền: {totalAmountSelectedItems()}</h2>
+          <br />
+          <input type="text" placeholder="Họ và tên" />
+          <br />
+          <input type="text" placeholder="Địa chỉ" />
+          <br />
+          <input type="text" placeholder="Số điện thoại" />
+          <br />
+          <label htmlFor="paymentMethod">Phương thức thanh toán:</label>
+          <input type="radio" />
+          Thanh toán khi nhận hàng
+          <input type="radio" />
+          Thanh toán trực tuyến
+          <br />
+          <input type="submit" value="Đặt hàng" />
+          <input type="button" value="Hủy" />
+        </form>
+      </dialog>
       <Footer />
     </>
   );

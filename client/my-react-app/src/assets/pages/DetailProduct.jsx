@@ -127,7 +127,7 @@ export default function DetailProduct() {
 
               <tr>
                 <td>Số lượng tồn kho</td>
-                <td>xxx sản phẩm</td>
+                <td>{data.quantityStock}</td>
               </tr>
 
               <tr>
@@ -138,7 +138,7 @@ export default function DetailProduct() {
                     fontWeight: "bold",
                   }}
                 >
-                  {data.status}
+                  {data.quantityStock > 0 ? "Còn hàng" : "Hết hàng"}
                 </td>
               </tr>
             </tbody>
