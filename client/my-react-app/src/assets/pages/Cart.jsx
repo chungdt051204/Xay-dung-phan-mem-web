@@ -351,21 +351,21 @@ export default function Cart() {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Order summary */}
-          <div className="order-summary">
-            <div className="summary-row">
-              <span>Tạm tính ({selectedItems.reduce((s, i) => s + i.quantity, 0)} sản phẩm)</span>
-              <span className="amount">{totalAmountSelectedItems()}</span>
-            </div>
-            <div className="summary-row">
-              <span>Phí vận chuyển</span>
-              <span className="free-ship">Miễn phí</span>
-            </div>
-            <div className="summary-row total">
-              <span>Tổng thanh toán</span>
-              <span className="amount">{totalAmountSelectedItems()}</span>
+            {}
+            <div className="order-summary">
+              <div className="summary-row">
+                <span>Tạm tính ({selectedItems.length} sản phẩm)</span>
+                <span className="amount">{totalAmountSelectedItems()}</span>
+              </div>
+              <div className="summary-row">
+                <span>Phí vận chuyển</span>
+                <span className="free-ship">Miễn phí</span>
+              </div>
+              <div className="summary-row total">
+                <span>Tổng thanh toán</span>
+                <span className="amount">{totalAmountSelectedItems()}</span>
+              </div>
             </div>
           </div>
 

@@ -296,11 +296,9 @@
 
 
 .order-summary {
-  padding: 16px 28px;
-  background: #fdf5f5;
-  border-top: 1px solid #f0dada;
-  border-bottom: 1px solid #f0dada;
-  flex-shrink: 0;
+  padding: 16px 0;
+  margin-top: 16px;
+  border-top: 2px solid #f0dada;
   display: flex;
   flex-direction: column;
   gap: 0;
