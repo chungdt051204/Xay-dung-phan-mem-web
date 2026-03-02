@@ -183,7 +183,7 @@ export default function BrandManager() {
           </tr>
         </thead>
         <tbody>
-          {brands.map((brand) => (
+          {brands?.map((brand) => (
             <tr key={brand._id}>
               <td>{brand.brandName}</td>
               <td>
