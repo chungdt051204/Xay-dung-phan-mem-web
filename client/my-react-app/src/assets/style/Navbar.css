@@ -5,7 +5,7 @@
 
 .navbar {
   height: 64px;
-  width: 100vw;
+  width: 1260px;
   background: #df3346;
   display: flex;
   align-items: center;
@@ -28,7 +28,7 @@
 }
 
 .navbar-category {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   border: none;
   color: white;
   padding: 8px 12px;
@@ -40,7 +40,7 @@
 }
 
 .navbar-category:hover {
-  background: rgba(255,255,255,0.25);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .navbar-search {
@@ -110,7 +110,7 @@
 }
 
 .login {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   padding: 8px 12px;
   border-radius: 6px;
 }

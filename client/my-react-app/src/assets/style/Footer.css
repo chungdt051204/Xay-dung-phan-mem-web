@@ -4,13 +4,14 @@
   color: #ffffff;
   padding-top: 2rem;
   margin-top: 2rem;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial;
 }
 
 .footer-top {
-  max-width: 1120px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 2rem 1rem;
   display: grid;
@@ -28,13 +29,13 @@
 
 /* Brand */
 .brand-logo {
-  font-family: 'Pacifico', 'Brush Script MT', cursive;
+  font-family: "Pacifico", "Brush Script MT", cursive;
   font-size: 1.6rem;
   color: #111827;
   margin-bottom: 0.5rem;
 }
 .brand-desc {
-  color: rgba(255,255,255,0.92);
+  color: rgba(255, 255, 255, 0.92);
   font-size: 0.95rem;
   line-height: 1.5;
   margin: 0 0 1rem 0;
@@ -52,15 +53,18 @@
   width: 44px;
   height: auto;
   display: inline-block;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 0.4rem;
   border-radius: 8px;
   box-shadow: none;
   object-fit: contain;
 }
 @media (max-width: 520px) {
-  .payment-icon { width: 36px; padding: 0.3rem; }
+  .payment-icon {
+    width: 36px;
+    padding: 0.3rem;
+  }
 }
 
 /* Links */
@@ -73,7 +77,7 @@
   gap: 0.5rem;
 }
 .footer-links a {
-  color: rgba(255,255,255,0.95);
+  color: rgba(255, 255, 255, 0.95);
   text-decoration: none;
   font-size: 0.95rem;
 }
@@ -98,7 +102,7 @@
   outline: none;
 }
 .newsletter-control input[type="email"]:focus {
-  box-shadow: 0 0 0 4px rgba(14,165,233,0.08);
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.08);
   border-color: #60a5fa;
 }
 .subscribe-btn {
@@ -109,12 +113,12 @@
   border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(239,68,68,0.14);
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.14);
 }
 .subscribe-btn:hover,
 .subscribe-btn:focus {
   transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(239,68,68,0.18);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.18);
 }
 
 .socials {
@@ -129,7 +133,7 @@
   width: 36px;
   height: 36px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.12);
   color: #fff;
   text-decoration: none;
 }
@@ -149,10 +153,10 @@
 
 /* Footer bottom */
 .footer-bottom {
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   padding: 1rem 0 2rem;
   text-align: center;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.9rem;
 }
 
@@ -162,20 +166,41 @@
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
   }
-  .brand-desc { max-width: none; }
+  .brand-desc {
+    max-width: none;
+  }
 }
 @media (max-width: 520px) {
-  .footer-top { grid-template-columns: 1fr; }
-  .newsletter-control { flex-direction: column; align-items: stretch; }
-  .subscribe-btn { width: 100%; }
+  .footer-top {
+    grid-template-columns: 1fr;
+  }
+  .newsletter-control {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .subscribe-btn {
+    width: 100%;
+  }
 }
 
 /* Utility */
-.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .subscribe-btn,
   .social,
-  .pay-badge { transition: none !important; }
+  .pay-badge {
+    transition: none !important;
+  }
 }
