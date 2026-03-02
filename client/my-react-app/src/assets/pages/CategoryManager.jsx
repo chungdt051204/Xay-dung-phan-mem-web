@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import { api } from "../../App";
 import fetchApi from "../../service/api";
 import ConfirmDialog from "../components/ConfirmDialog";
+import "../style/CategoryManager.css";
+
 export default function CategoryManager() {
   const { categories, setRefresh } = useContext(AppContext);
   const navigate = useNavigate();
@@ -143,18 +145,31 @@ export default function CategoryManager() {
   };
 
   return (
-    <div className="page-box">
-      <h2>Quản lý loại sản phẩm</h2>
-      <button
-        onClick={() => {
-          formDialog.current.showModal();
-        }}
-      >
-        Thêm loại
-      </button>
-      <dialog ref={formDialog}>
-        <h2>{isEdit ? "Cập nhật loại sản phẩm" : "Thêm loại sản phẩm"}</h2>
-        <form onSubmit={isEdit ? handleUpdateCategory : handleCreateCategory}>
+  <div className="category-page">
+    <div className="category-card">
+      <div className="category-header">
+        <h2>Quản lý loại sản phẩm</h2>
+        <button
+          className="category-btn-add"
+          onClick={() => {
+            setIsEdit(false);
+            setCategoryName("");
+            formDialog.current.showModal();
+          }}
+        >
+          + Thêm loại
+        </button>
+      </div>
+
+      <dialog ref={formDialog} className="category-dialog">
+        <h2>
+          {isEdit ? "Cập nhật loại sản phẩm" : "Thêm loại sản phẩm"}
+        </h2>
+
+        <form
+          onSubmit={isEdit ? handleUpdateCategory : handleCreateCategory}
+          className="category-form"
+        >
           <input
             type="text"
             placeholder="Tên danh mục"
@@ -162,51 +177,73 @@ export default function CategoryManager() {
             onChange={(e) => setCategoryName(e.target.value)}
             required
           />
-          <button
-            type="button"
-            onClick={() => {
-              setSearchParams((prev) => {
-                const newParams = new URLSearchParams(prev);
-                if (newParams.has("id")) newParams.delete("id");
-                return newParams;
-              });
-              formDialog.current.close();
-            }}
-          >
-            Hủy
-          </button>
-          <button>Lưu</button>
+
+          <div className="category-dialog-actions">
+            <button
+              type="button"
+              className="category-btn-cancel"
+              onClick={() => {
+                setSearchParams((prev) => {
+                  const newParams = new URLSearchParams(prev);
+                  if (newParams.has("id")) newParams.delete("id");
+                  return newParams;
+                });
+                formDialog.current.close();
+              }}
+            >
+              Hủy
+            </button>
+
+            <button className="category-btn-save">Lưu</button>
+          </div>
         </form>
       </dialog>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Tên danh mục</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          {categories.map((category) => (
-            <tr key={category._id}>
-              <td>{category.categoryName}</td>
-              <td>
-                <button onClick={() => handleOpenConfirmDialog(category._id)}>
-                  Xóa
-                </button>
-                <button onClick={() => handleOpenDialog(category._id)}>
-                  Sửa
-                </button>
-              </td>
+      <div className="category-table-wrapper">
+        <table className="category-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Tên danh mục</th>
+              <th>Hành động</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {categories.map((category, index) => (
+              <tr key={category._id}>
+                <td>{index + 1}</td>
+                <td>{category.categoryName}</td>
+                <td className="category-action-buttons">
+                  <button
+                    className="category-btn-delete"
+                    onClick={() =>
+                      handleOpenConfirmDialog(category._id)
+                    }
+                  >
+                    Xóa
+                  </button>
+
+                  <button
+                    className="category-btn-edit"
+                    onClick={() =>
+                      handleOpenDialog(category._id)
+                    }
+                  >
+                    Sửa
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       <ConfirmDialog
         ref={confirmDialog}
         content="Bạn có muốn xóa loại sản phẩm này không ?"
         handleClick={handleDelete}
       />
     </div>
-  );
+  </div>
+);
 }

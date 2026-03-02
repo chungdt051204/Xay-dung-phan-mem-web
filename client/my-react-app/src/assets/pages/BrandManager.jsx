@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import fetchApi from "../../service/api";
 import { api } from "../../App";
 import ConfirmDialog from "../components/ConfirmDialog";
+import "../style/BrandManager.css";
 
 export default function BrandManager() {
   const { brands, setRefresh } = useContext(AppContext);
@@ -139,68 +140,96 @@ export default function BrandManager() {
   };
 
   return (
-    <div className="page-box">
-      <h2>Quản lý thương hiệu</h2>
-      <button
-        onClick={() => {
-          formDialog.current.showModal();
-        }}
-      >
-        Thêm thương hiệu
-      </button>
-      <dialog ref={formDialog}>
-        <h2>{isEdit ? "Cập nhật thương hiệu" : "Thêm thương hiệu"}</h2>
-        <form onSubmit={isEdit ? handleUpdateBrand : handleCreateBrand}>
-          <input
-            type="text"
-            placeholder="Tên thương hiệu"
-            value={brandName}
-            onChange={(e) => setBrandName(e.target.value)}
-            required
-          />
+    <div className="brand-page">
+      <div className="brand-card">
+        <div className="brand-header">
+          <h2>Quản lý thương hiệu</h2>
           <button
-            type="button"
+            className="btn-add"
             onClick={() => {
-              setSearchParams((prev) => {
-                const newParams = new URLSearchParams(prev);
-                if (newParams.has("id")) newParams.delete("id");
-                return newParams;
-              });
-              formDialog.current.close();
+              setIsEdit(false);
+              setBrandName("");
+              formDialog.current.showModal();
             }}
           >
-            Hủy
+            + Thêm thương hiệu
           </button>
-          <button>Lưu</button>
-        </form>
-      </dialog>
+        </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Tên thương hiệu</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          {brands?.map((brand) => (
-            <tr key={brand._id}>
-              <td>{brand.brandName}</td>
-              <td>
-                <button onClick={() => handleOpenConfirmDialog(brand._id)}>
-                  Xóa
-                </button>
-                <button onClick={() => handleOpenDialog(brand._id)}>Sửa</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <ConfirmDialog
-        ref={confirmDialog}
-        content="Bạn có muốn xóa thương hiệu này không ?"
-        handleClick={handleDelete}
-      />
+        <dialog ref={formDialog} className="brand-dialog">
+          <h2>{isEdit ? "Cập nhật thương hiệu" : "Thêm thương hiệu"}</h2>
+          <form
+            onSubmit={isEdit ? handleUpdateBrand : handleCreateBrand}
+            className="brand-form"
+          >
+            <input
+              type="text"
+              placeholder="Tên thương hiệu"
+              value={brandName}
+              onChange={(e) => setBrandName(e.target.value)}
+              required
+            />
+
+            <div className="dialog-actions">
+              <button
+                type="button"
+                className="btn-cancel"
+                onClick={() => {
+                  setSearchParams((prev) => {
+                    const newParams = new URLSearchParams(prev);
+                    if (newParams.has("id")) newParams.delete("id");
+                    return newParams;
+                  });
+                  formDialog.current.close();
+                }}
+              >
+                Hủy
+              </button>
+              <button className="btn-save">Lưu</button>
+            </div>
+          </form>
+        </dialog>
+
+        <div className="brand-table-wrapper">
+          <table className="brand-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tên thương hiệu</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {brands?.map((brand, index) => (
+                <tr key={brand._id}>
+                  <td>{index + 1}</td>
+                  <td>{brand.brandName}</td>
+                  <td className="action-buttons">
+                    <button
+                      className="btn-delete"
+                      onClick={() => handleOpenConfirmDialog(brand._id)}
+                    >
+                      Xóa
+                    </button>
+                    <button
+                      className="btn-edit"
+                      onClick={() => handleOpenDialog(brand._id)}
+                    >
+                      Sửa
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <ConfirmDialog
+          ref={confirmDialog}
+          content="Bạn có muốn xóa thương hiệu này không ?"
+          handleClick={handleDelete}
+        />
+      </div>
     </div>
   );
 }

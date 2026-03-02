@@ -5,6 +5,8 @@ import fetchApi from "../../service/api";
 import { toast } from "react-toastify";
 import { api } from "../../App";
 import ConfirmDialog from "../components/ConfirmDialog";
+import "../style/UserManager.css";
+
 export default function UserManager() {
   const { refresh, setRefresh, users, setUsers } = useContext(AppContext);
   const navigate = useNavigate();
@@ -121,18 +123,20 @@ export default function UserManager() {
       });
   };
   return (
-    <div className="page-box">
+    <div className="user-manager">
       <h2>Quản lý người dùng</h2>
-      <select
-        onChange={(e) => {
-          handleRoleSelected(e.target.value);
-        }}
-      >
-        <option value="">Chọn vai trò</option>
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-      </select>
-      <table>
+      <div className="user-filter">
+        <select
+          onChange={(e) => {
+            handleRoleSelected(e.target.value);
+          }}
+        >
+          <option value="">Chọn vai trò</option>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <table className="user-table">
         <thead>
           <tr>
             <th>Người dùng</th>
@@ -147,21 +151,30 @@ export default function UserManager() {
           {users?.docs?.map((value) => {
             return (
               <tr key={value._id}>
-                <td style={{ display: "flex" }}>
-                  <img
-                    src={value.avatar}
-                    alt=""
-                    width={50}
-                    height={50}
-                    referrerPolicy="no-referrer"
-                  />
-                  <p>{value.fullname}</p>
+                <td>
+                  <div className="user-info">
+                    <img
+                      src={value.avatar}
+                      alt=""
+                      className="user-avatar"
+                      referrerPolicy="no-referrer"
+                    />
+                    <span>{value.fullname}</span>
+                  </div>
                 </td>
                 <td>{value.email}</td>
-                <td>{value.roles}</td>
-                <td>{value.status}</td>
-                <td>{value.createdAt}</td>
                 <td>
+                  <span className={`badge ${value.roles === "admin" ? "badge-admin" : "badge-user"}`}>
+                    {value.roles}
+                  </span>
+                </td>
+                <td>
+                  <span className={`badge ${value.status === "active" ? "badge-active" : "badge-inactive"}`}>
+                    {value.status}
+                  </span>
+                </td>
+                <td>{value.createdAt}</td>
+                <td className="user-actions">
                   <button onClick={() => handleOpenDialog(value._id)}>
                     Xem chi tiết
                   </button>
@@ -183,67 +196,82 @@ export default function UserManager() {
           })}
         </tbody>
       </table>
-      <dialog ref={formDialog}>
-        <form style={{ display: "flex" }}>
-          <img src={formUser.avatar} alt="" width={80} height={100} />
-          <div>
-            <label htmlFor="fullname">Họ và tên:</label>
-            <input type="text" readOnly value={formUser.fullname} />
-            <br />
-            <label htmlFor="username">Tên đăng nhập:</label>
-            <input type="text" readOnly value={formUser.username} />
-            <br />
-            <label htmlFor="email">Email:</label>
-            <input type="text" readOnly value={formUser.email} />
-            <br />
-            <label htmlFor="password">Password:</label>
-            <input type="password" readOnly value={formUser.password} />
-            <br />
-            <label htmlFor="phone">Phone:</label>
-            <input type="text" readOnly value={formUser.phone} />
-            <br />
-            <label htmlFor="role">Vai trò:</label>
-            <input type="text" readOnly value={formUser.role} />
-            <br />
-            <label htmlFor="gender">Giới tính:</label>
-            <input type="text" readOnly value={formUser.gender} />
-            <br />
-            <label htmlFor="dateOfBirth">Ngày sinh:</label>
+      <dialog className="UserManager-dialog" ref={formDialog}>
+        <form className="user-detail">
+          <img
+            src={formUser.avatar}
+            alt=""
+            className="user-avatar"
+            referrerPolicy="no-referrer"
+          />
+          <div className="user-detail-content">
+            <label>Họ và tên:</label>
+            <input type="text" readOnly value={formUser.fullname || ""} />
+
+            <label>Tên đăng nhập:</label>
+            <input type="text" readOnly value={formUser.username || ""} />
+
+            <label>Email:</label>
+            <input type="text" readOnly value={formUser.email || ""} />
+
+            <label>Password:</label>
+            <input type="password" readOnly value={formUser.password || ""} />
+
+            <label>Phone:</label>
+            <input type="text" readOnly value={formUser.phone || ""} />
+
+            <label>Vai trò:</label>
+            <input type="text" readOnly value={formUser.role || ""} />
+
+            <label>Giới tính:</label>
+            <input type="text" readOnly value={formUser.gender || ""} />
+
+            <label>Ngày sinh:</label>
             <input
               type="text"
               readOnly
               value={
-                formUser.dateOfBirth &&
-                new Date(formUser.dateOfBirth).toLocaleDateString()
+                formUser.dateOfBirth
+                  ? new Date(formUser.dateOfBirth).toLocaleDateString()
+                  : ""
               }
             />
-            <br />
-            <label htmlFor="status">Trạng thái:</label>
-            <input type="text" readOnly value={formUser.status} />
-            <br />
-            <label htmlFor="loginMethod">Phương thức đăng nhập:</label>
-            <input type="text" readOnly value={formUser.loginMethod} />
-            <br />
-            <label htmlFor="isVerified">Trạng thái xác thực:</label>
+            <label>Trạng thái:</label>
+            <input type="text" readOnly value={formUser.status || ""} />
+
+            <label>Phương thức đăng nhập:</label>
+            <input type="text" readOnly value={formUser.loginMethod || ""} />
+
+            <label>Trạng thái xác thực:</label>
             <input
               type="text"
               readOnly
               value={formUser.isVerified ? "Đã xác thực" : "Chưa xác thực"}
             />
-            <br />
-            <button
-              type="button"
-              onClick={() => {
-                setSearchParams((prev) => {
-                  const newParams = new URLSearchParams(prev);
-                  if (newParams.has("id")) newParams.delete("id");
-                  return newParams;
-                });
-                formDialog.current.close();
-              }}
-            >
-              Thoát
-            </button>
+            <div style={{ gridColumn: "1 / -1", textAlign: "right", marginTop: "10px" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchParams((prev) => {
+                    const newParams = new URLSearchParams(prev);
+                    if (newParams.has("id")) newParams.delete("id");
+                    return newParams;
+                  });
+                  formDialog.current.close();
+                }}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: "8px",
+                  border: "none",
+                  background: "#e74c3c",
+                  color: "white",
+                  cursor: "pointer"
+                }}
+              >
+                Thoát
+              </button>
+            </div>
+
           </div>
         </form>
       </dialog>
