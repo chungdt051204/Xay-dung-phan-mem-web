@@ -16,6 +16,7 @@ import Confirm from "./assets/pages/Confirm";
 import DetailProduct from "./assets/pages/DetailProduct";
 import Cart from "./assets/pages/Cart"; // cart page/component
 import fetchApi from "./service/api";
+import AccessDeniedPage from "./assets/pages/AccessDeniedPage";
 
 export const api = "http://localhost:3000";
 
@@ -101,6 +102,7 @@ function App() {
         <Route path="/confirm" element={<Confirm />} />
         <Route path="product/detail" element={<DetailProduct />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/access-denied" element={<AccessDeniedPage />} />
         {/* Routes cho phía Admin  */}
         <Route path="/admin" element={<HomeAdmin />}>
           <Route path="brands" element={<BrandManager />} />{" "}
