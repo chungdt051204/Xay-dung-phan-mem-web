@@ -8,6 +8,7 @@ import "../style/Cart.css";
 import fetchApi from "../../service/api";
 import { api } from "../../App";
 import { toast } from "react-toastify";
+import "../style/PaymentDialog.css";
 
 export default function Cart() {
   const { isLoading, isLogin, me, refresh, setRefresh } =
@@ -252,60 +253,138 @@ export default function Cart() {
           )}
         </div>
       </div>
-      <dialog ref={formDialog} style={{ width: "1000px" }}>
-        <h2>Xác nhận thanh toán</h2>
-        <form>
-          <table border={1} cellSpacing={0} style={{ width: "800px" }}>
-            <thead>
-              <tr>
-                <th>Sản phẩm</th>
-                <th>Giá</th>
-                <th>Số lượng</th>
-                <th>Tổng tiền</th>
-              </tr>
-            </thead>
-            <tbody>
-              {selectedItems?.map((value) => {
-                return (
-                  <tr key={value._id}>
-                    <td>
-                      <img
-                        src={value.productId.image}
-                        alt=""
-                        width={80}
-                        height={100}
-                      />
-                      <p>{value.productId.productName}</p>
-                      <p>{value.productId.description}</p>
-                      <h6>{value.productId.techSpecs}</h6>
-                    </td>
-                    <td>{value.productId.price + " " + "VNĐ"} </td>
-                    <td>{value.quantity}</td>
-                    <td>
-                      {value.productId.price * value.quantity + " " + "VNĐ"}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          <br />
-          <h2>Tổng tiền: {totalAmountSelectedItems()}</h2>
-          <br />
-          <input type="text" placeholder="Họ và tên" />
-          <br />
-          <input type="text" placeholder="Địa chỉ" />
-          <br />
-          <input type="text" placeholder="Số điện thoại" />
-          <br />
-          <label htmlFor="paymentMethod">Phương thức thanh toán:</label>
-          <input type="radio" />
-          Thanh toán khi nhận hàng
-          <input type="radio" />
-          Thanh toán trực tuyến
-          <br />
-          <input type="submit" value="Đặt hàng" />
-          <input type="button" value="Hủy" />
+        {}
+      <dialog ref={formDialog} className="payment-dialog">
+
+        {}
+        <div className="dialog-header">
+          <div className="dialog-header-text">
+            <span className="dialog-header-sub">Xác nhận đơn hàng</span>
+            <h2>Thanh toán</h2>
+          </div>
+          <button
+            type="button"
+            className="close-btn"
+            onClick={() => formDialog.current.close()}
+          >
+            ✕
+          </button>
+        </div>
+
+        <form className="payment-form" method="dialog">
+
+          <div className="dialog-content">
+
+            {}
+            <div className="products-section">
+              <h3>Sản phẩm đặt hàng ({selectedItems.length})</h3>
+              <div className="products-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Sản phẩm</th>
+                      <th>Đơn giá</th>
+                      <th className="quantity-cell">Số lượng</th>
+                      <th className="total-cell">Thành tiền</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedItems?.map((value) => (
+                      <tr key={value._id}>
+                        <td>
+                          <div className="product-cell">
+                            <img
+                              src={value.productId.image}
+                              alt={value.productId.productName}
+                            />
+                            <div>
+                              <p className="product-name">{value.productId.productName}</p>
+                              <p className="product-desc">{value.productId.description}</p>
+                              <p className="product-desc">{value.productId.techSpecs}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td>{value.productId.price.toLocaleString("vi-VN")}₫</td>
+                        <td className="quantity-cell">{value.quantity}</td>
+                        <td className="total-cell">
+                          {(value.productId.price * value.quantity).toLocaleString("vi-VN")}₫
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {}
+            <div className="form-section">
+              <div className="form-section-title">Thông tin giao hàng</div>
+
+              <div className="form-group">
+                <label htmlFor="fullname">Họ và tên <span className="required">*</span></label>
+                <input id="fullname" type="text" placeholder="Nguyễn Văn A" required />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="address">Địa chỉ giao hàng <span className="required">*</span></label>
+                <input id="address" type="text" placeholder="123 Lê Lợi, Quận 1, TP. Hồ Chí Minh" required />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="phone">Số điện thoại <span className="required">*</span></label>
+                <input id="phone" type="tel" placeholder="0901 234 567" required />
+              </div>
+
+              <div className="form-group">
+                <label>Phương thức thanh toán <span className="required">*</span></label>
+                <div className="payment-methods">
+                  <label className="radio-label">
+                    <input type="radio" name="paymentMethod" value="cod" defaultChecked />
+                    <span className="radio-icon">🚚</span>
+                    <span>Thanh toán khi nhận hàng</span>
+                  </label>
+                  <label className="radio-label">
+                    <input type="radio" name="paymentMethod" value="online" />
+                    <span className="radio-icon">💳</span>
+                    <span>Thanh toán trực tuyến</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Order summary */}
+          <div className="order-summary">
+            <div className="summary-row">
+              <span>Tạm tính ({selectedItems.reduce((s, i) => s + i.quantity, 0)} sản phẩm)</span>
+              <span className="amount">{totalAmountSelectedItems()}</span>
+            </div>
+            <div className="summary-row">
+              <span>Phí vận chuyển</span>
+              <span className="free-ship">Miễn phí</span>
+            </div>
+            <div className="summary-row total">
+              <span>Tổng thanh toán</span>
+              <span className="amount">{totalAmountSelectedItems()}</span>
+            </div>
+          </div>
+
+          {}
+          <div className="dialog-actions">
+            <div className="action-btns">
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={() => formDialog.current.close()}
+              >
+                Hủy
+              </button>
+              <button type="submit" className="submit-btn">
+                Đặt hàng ngay →
+              </button>
+            </div>
+          </div>
+
         </form>
       </dialog>
       <Footer />

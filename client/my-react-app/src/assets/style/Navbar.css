@@ -1,5 +1,6 @@
 * {
   box-sizing: border-box;
+  margin: 0px;
 }
 
 .navbar {
@@ -92,7 +93,6 @@
   color: white;
 }
 
-/* link wrapper around cart icon */
 .cart-link {
   display: flex;
   align-items: center;
