@@ -4,139 +4,101 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { api } from "../../App";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
+import { toast } from "react-toastify";
 import "../style/Auth.css";
 
 export default function Register() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [formData, setFormData] = useState({
-    fullname: "",
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phone: "",
-    dateOfBirth: "",
-    gender: "chưa chọn",
+  const phoneRegex = /^0\d{9}$/;
+  const registerSchema = z
+    .object({
+      fullname: z.string().trim().min(1, "Họ tên không được bỏ trống"),
+      username: z
+        .string()
+        .trim()
+        .min(1, "Tên đăng nhập phải có tối thiểu 5 ký tự"),
+      email: z.email("Email không đúng định dạng"),
+      password: z.string().trim().min(8, "Mật khẩu phải có ít nhất 8 ký tự"),
+      confirmPassword: z.string(),
+      phone: z
+        .string()
+        .min(1, "Vui lòng nhập số điện thoại")
+        .regex(phoneRegex, "Số điện thoại không hợp lệ"),
+      dateOfBirth: z.coerce.date("Vui lòng chọn ngày sinh hợp lệ"),
+      gender: z
+        .enum(["nam", "nữ", "chưa chọn"])
+        .optional()
+        .default("chưa chọn"),
+      avatar: z
+        .any()
+        .refine((files) => files?.length > 0, "Vui lòng chọn file"),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: "Mật khẩu không khớp",
+      path: ["confirmPassword"],
+    });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      fullname: "",
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      phone: "",
+      dateOfBirth: "",
+      gender: "chưa chọn",
+    },
+    mode: "onTouched",
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    setError(""); // Clear error when user starts typing
-  };
-
-  const validateForm = () => {
-    if (
-      !formData.fullname ||
-      !formData.username ||
-      !formData.email ||
-      !formData.password ||
-      !formData.confirmPassword ||
-      !formData.phone ||
-      !formData.dateOfBirth
-    ) {
-      setError("Vui lòng điền đầy đủ thông tin");
-      return false;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Mật khẩu phải có ít nhất 6 ký tự");
-      return false;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Mật khẩu không trùng khớp");
-      return false;
-    }
-
-    if (!isValidEmail(formData.email)) {
-      setError("Email không hợp lệ");
-      return false;
-    }
-
-    if (!isValidPhone(formData.phone)) {
-      setError("Số điện thoại phải là 10 số");
-      return false;
-    }
-
-    return true;
-  };
-
-  const isValidEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const isValidPhone = (phone) => {
-    return /^\d{10}$/.test(phone.replace(/\D/g, ""));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
+  const onSubmit = (data) => {
     setLoading(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      const response = await fetch(`${API_URL}/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fullname: formData.fullname,
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-          phone: formData.phone,
-          dateOfBirth: formData.dateOfBirth,
-          gender: formData.gender,
-        }),
+    const dataToSend = new FormData();
+    dataToSend.append("fullname", data.fullname);
+    dataToSend.append("username", data.username);
+    dataToSend.append("email", data.email);
+    dataToSend.append("password", data.password);
+    dataToSend.append("confirmPassword", data.confirmPassword);
+    dataToSend.append("phone", data.phone);
+    dataToSend.append("dateOfBirth", data.dateOfBirth);
+    dataToSend.append("gender", data.gender);
+    dataToSend.append("avatar", data.avatar[0]);
+    localStorage.setItem("resetEmail", data.email);
+    localStorage.setItem("method", "register");
+    fetch(`${api}/register`, {
+      method: "POST",
+      body: dataToSend,
+    })
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw res;
+      })
+      .then(({ message }) => {
+        toast.success(message);
+        setTimeout(() => {
+          navigate("/confirm");
+        }, 1000);
+      })
+      .catch(async (err) => {
+        if (err.status === 409) {
+          const { message } = await err.json();
+          setError(message);
+        }
+      })
+      .finally(() => {
+        setLoading(false);
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Đăng ký thất bại");
-      }
-
-      setSuccess("Đăng ký thành công! Chuyển hướng đến trang đăng nhập...");
-      setFormData({
-        fullname: "",
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        phone: "",
-        dateOfBirth: "",
-        gender: "chưa chọn",
-      });
-
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
     <>
-      <Navbar />
       <div className="auth-wrapper">
         <div className="auth-card">
           <h2>ĐĂNG KÝ</h2>
@@ -219,7 +181,6 @@ export default function Register() {
           </form>
         </div>
       </div>
-      <Footer />
     </>
   );
 }
