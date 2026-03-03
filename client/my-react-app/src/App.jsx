@@ -1,4 +1,5 @@
 import { Routes, Route, useSearchParams } from "react-router-dom";
+// App.jsx - thiếu brands và categories
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import AppContext from "./assets/components/AppContext";
@@ -27,6 +28,8 @@ function App() {
   const [me, setMe] = useState(null);
   const isAdmin = !isLoading && isLogin && me?.roles === "admin";
   const [products, setProducts] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const token = searchParams.get("token");
@@ -61,6 +64,8 @@ function App() {
   }, [refresh, isLoading, searchParams, setSearchParams]);
   useEffect(() => {
     fetchApi({ url: `${api}/product`, setData: setProducts });
+    fetchApi({ url: `${api}/brand`, setData: setBrands });     
+    fetchApi({ url: `${api}/category`, setData: setCategories });
   }, [refresh]);
 
   return (
@@ -75,6 +80,8 @@ function App() {
         setMe,
         isAdmin,
         products,
+        brands,
+        categories
       }}
     >
       <Routes>

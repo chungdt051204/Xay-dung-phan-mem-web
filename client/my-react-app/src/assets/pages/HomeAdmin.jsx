@@ -9,13 +9,19 @@ export default function HomeAdmin() {
   const navigate = useNavigate();
   const { isLoading, isLogin, isAdmin, me } = useContext(AppContext);
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/");
+      return;
+    }
     if (!isLoading) {
-      if (!isLogin || me?.roles !== "admin") navigate("/");
+      if (!isLogin || me?.roles !== "admin") {
+        navigate("/");
+        return;
+      }
     }
   }, [isLoading, isLogin, me, navigate]);
-  if (isLoading) {
-    return <div>Bạn ko có quyền vào trang này</div>;
-  }
+
   return (
     <div className="admin-wrapper">
       <aside className="admin-sidebar">
@@ -82,11 +88,6 @@ export default function HomeAdmin() {
 
       <main className="admin-main">
         <header className="admin-header">
-          <div className="admin-search">
-            <i className="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="Tìm kiếm hệ thống..." />
-          </div>
-
           <div className="admin-header-right">
             <div className="icon-badge">
               <i className="fa-regular fa-bell"></i>
