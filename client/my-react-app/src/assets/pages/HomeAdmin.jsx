@@ -1,26 +1,27 @@
 import { useContext, useEffect } from "react";
-import AppContext from "../components/AppContext";
-import { Outlet, useNavigate, Link } from "react-router-dom";
-
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import AppContext from "./AppContext";
 import logo from "../../assets/Logo.png";
 import "../style/Admin.css";
 
-export default function HomeAdmin() {
+export default function AdminLayout() {
+  const { me, isLogin, isLoading } = useContext(AppContext);
+  const location = useLocation();
   const navigate = useNavigate();
-  const { isLoading, isLogin, isAdmin, me } = useContext(AppContext);
+  
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/");
-      return;
-    }
     if (!isLoading) {
-      if (!isLogin || me?.roles !== "admin") {
-        navigate("/");
-        return;
+      if (!isLogin || me?.role !== "admin") {
+        navigate("/", { replace: true });
       }
     }
   }, [isLoading, isLogin, me, navigate]);
+
+  function isActive(path) {
+    return location.pathname === path ? "active" : "";
+  }
+
+  if (isLoading || !isLogin || me?.role !== "admin") return null;
 
   return (
     <div className="admin-wrapper">
@@ -46,32 +47,32 @@ export default function HomeAdmin() {
         <nav className="admin-nav">
           <p className="nav-label">QUẢN TRỊ</p>
 
-          <Link to="/admin">
+          <Link to="/admin" className={isActive("/admin")}>
             <i className="fa-solid fa-chart-line"></i>
             <span>Dashboard</span>
           </Link>
 
-          <Link to="/admin/brands">
+          <Link to="/admin/brands" className={isActive("/admin/brands")}>
             <i className="fa-solid fa-tags"></i>
             <span>Thương hiệu</span>
           </Link>
 
-          <Link to="/admin/categories">
+          <Link to="/admin/categories" className={isActive("/admin/categories")}>
             <i className="fa-solid fa-layer-group"></i>
             <span>Loại sản phẩm</span>
           </Link>
 
-          <Link to="/admin/products">
+          <Link to="/admin/products" className={isActive("/admin/products")}>
             <i className="fa-solid fa-box-open"></i>
             <span>Sản phẩm</span>
           </Link>
 
-          <Link to="/admin/users">
+          <Link to="/admin/users" className={isActive("/admin/users")}>
             <i className="fa-solid fa-users-gear"></i>
             <span>Người dùng</span>
           </Link>
 
-          <Link to="/admin/orders">
+          <Link to="/admin/orders" className={isActive("/admin/orders")}>
             <i className="fa-solid fa-cart-flatbed"></i>
             <span>Đơn hàng</span>
           </Link>
@@ -88,6 +89,11 @@ export default function HomeAdmin() {
 
       <main className="admin-main">
         <header className="admin-header">
+          <div className="admin-search">
+            <i className="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Tìm kiếm hệ thống..." />
+          </div>
+
           <div className="admin-header-right">
             <div className="icon-badge">
               <i className="fa-regular fa-bell"></i>
@@ -100,6 +106,7 @@ export default function HomeAdmin() {
             />
           </div>
         </header>
+
         <section className="admin-page-content">
           <Outlet />
         </section>
