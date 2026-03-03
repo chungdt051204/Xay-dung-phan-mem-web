@@ -1,0 +1,253 @@
+.user-manager {
+  padding: 30px;
+  background: #f4f6f9;
+  min-height: 100vh;
+}
+
+.user-manager h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.user-filter {
+  margin-bottom: 20px;
+}
+
+.user-filter select {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #dcdfe6;
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+.user-table th {
+  background: #f0f2f5;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.user-table td {
+  padding: 14px;
+  border-bottom: 1px solid #f0f2f5;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.user-table tr:hover {
+  background: #f9fafc;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.badge-user {
+  background: #ecf0f3;
+  color: #555;
+}
+
+.badge-admin {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.badge-active {
+  background: #2ecc71;
+  color: white;
+}
+
+.badge-inactive {
+  background: #95a5a6;
+  color: white;
+}
+
+.user-actions button {
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-right: 6px;
+  transition: 0.2s;
+}
+
+.btn-detail {
+  background: #3498db;
+  color: white;
+}
+
+.btn-detail:hover {
+  background: #2980b9;
+}
+
+.btn-toggle {
+  background: #f39c12;
+  color: white;
+}
+
+.btn-toggle:hover {
+  background: #e67e22;
+}
+
+.UserManager-dialog{
+  border: none;
+  border-radius: 16px;
+  padding: 25px;
+  width: 600px;
+  max-width: 90%;
+}
+
+.UserManager-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.user-detail {
+  display: flex;
+  gap: 25px;
+}
+
+.user-detail img {
+  width: 120px;
+  height: 140px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.user-detail-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  row-gap: 10px;
+  column-gap: 10px;
+  font-size: 14px;
+}
+
+.user-detail-content label {
+  font-weight: 600;
+}
+
+.user-detail-content input {
+  border: none;
+  background: #f4f6f9;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.user-detail button {
+  margin-top: 15px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #e74c3c;
+  color: white;
+  cursor: pointer;
+}
+
+.UserManager-dialog {
+  border: none;
+  border-radius: 16px;
+  padding: 25px;
+  width: 700px;
+  max-width: 90%;
+  
+  margin: auto;  
+}
+
+.UserManager-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.confirm-dialog {
+  border: none;
+  border-radius: 16px;
+  padding: 0;
+  width: 400px;
+  max-width: 90%;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.confirm-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.confirm-box {
+  padding: 25px;
+  text-align: center;
+}
+
+.confirm-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.confirm-text {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn-cancel {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #ecf0f3;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background: #dcdfe6;
+}
+
+.btn-confirm {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #e74c3c;
+  color: white;
+  cursor: pointer;
+}
+
+.btn-confirm:hover {
+  background: #c0392b;
+}

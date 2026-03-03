@@ -2,6 +2,8 @@ import { useContext, useRef, useState } from "react";
 import AppContext from "../components/AppContext";
 import { toast } from "react-toastify";
 import { api } from "../../App";
+import "../style/ProductManager.css";
+
 export default function ProductManager() {
   const { products, brands, categories, setRefresh } = useContext(AppContext);
   const [productName, setProductName] = useState("");
@@ -198,10 +200,11 @@ export default function ProductManager() {
   };
 
   return (
-    <div className="page-box">
+    <div className="product-manager">
       <h2>Quản lý sản phẩm</h2>
       <h2>Form sản phẩm</h2>
       <form
+        className="product-form"
         onSubmit={(e) => {
           e.preventDefault();
           handleCreateProduct();
@@ -249,24 +252,28 @@ export default function ProductManager() {
           onChange={(e) => setProductQuantityStock(e.target.value)}
           required
         />
-        <input
-          type="radio"
-          name="status"
-          value="còn bán"
-          checked={productStatus === "còn bán"}
-          onChange={(e) => setProductStatus(e.target.value)}
-          required
-        />{" "}
-        Còn bán
-        <input
-          type="radio"
-          name="status"
-          value="ngừng bán"
-          checked={productStatus === "ngừng bán"}
-          onChange={(e) => setProductStatus(e.target.value)}
-          required
-        />{" "}
-        Ngừng bán
+        <div className="product-radio-group">
+          <label>
+            <input
+              type="radio"
+              name="status"
+              value="còn bán"
+              checked={productStatus === "còn bán"}
+              onChange={(e) => setProductStatus(e.target.value)}
+            />
+            Còn bán
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="status"
+              value="ngừng bán"
+              checked={productStatus === "ngừng bán"}
+              onChange={(e) => setProductStatus(e.target.value)}
+            />
+            Ngừng bán
+          </label>
+        </div>
         <select
           value={productBrandId}
           onChange={(e) => setProductBrandId(e.target.value)}
@@ -311,7 +318,7 @@ export default function ProductManager() {
         </button>
         <button onClick={handleClear}>Clear</button>
       </form>
-      <table>
+      <table className="product-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -344,8 +351,15 @@ export default function ProductManager() {
               <td>{product.quantityStock}</td>
               <td>{product.status}</td>
               <td>
-                <button onClick={() => handleDelete(product._id)}>Xóa</button>
                 <button
+                  className="product-delete-btn"
+                  onClick={() => handleDelete(product._id)}
+                >
+                  Xóa
+                </button>
+
+                <button
+                  className="product-edit-btn"
                   onClick={() =>
                     handleRow(
                       product._id,
