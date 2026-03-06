@@ -13,7 +13,6 @@ export default function UserNavbar() {
 
   const userMenuRef = useRef(null);
 
-
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
@@ -60,7 +59,6 @@ export default function UserNavbar() {
             </ul>
           )}
         </div>
-
       </div>
 
       <div className="navbar-search">
@@ -115,7 +113,7 @@ export default function UserNavbar() {
                 </li>
 
                 <li>
-                  <Link to="/orders" onClick={() => setOpenUserMenu(false)}>
+                  <Link to="/my-orders" onClick={() => setOpenUserMenu(false)}>
                     <i className="fa-solid fa-box"></i> Đơn hàng của tôi
                   </Link>
                 </li>

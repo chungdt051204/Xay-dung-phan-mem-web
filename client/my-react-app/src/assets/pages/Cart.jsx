@@ -17,6 +17,10 @@ export default function Cart() {
   const [myCart, setMyCart] = useState(null);
   const [itemIdsSelected, setItemIdsSelected] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [fullname, setFullname] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("cod");
   const formDialog = useRef();
 
   const totalAmount = () => {
@@ -161,12 +165,43 @@ export default function Cart() {
         });
     }
   };
-  const handleConfirmOrder = () => {
+  const handleOpenDialog = () => {
     if (itemIdsSelected.length === 0) {
       toast.warning("Vui lòng chọn sản phẩm để xác nhận thanh toán");
       return;
     }
     formDialog.current.showModal();
+  };
+  const handleConfirmOrder = (e) => {
+    e.preventDefault();
+    fetch(`${api}/order`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: me?._id,
+        fullname: fullname,
+        address: address,
+        phone: phone,
+        paymentMethod: paymentMethod,
+        total: totalAmount(),
+        items: selectedItems,
+      }),
+    })
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw res;
+      })
+      .then(({ message }) => {
+        toast.success(message);
+        formDialog.current.close();
+        setRefresh((prev) => prev + 1);
+      })
+      .catch(async (err) => {
+        const { message } = await err.json();
+        console.log(message);
+      });
   };
   return (
     <>
@@ -246,17 +281,15 @@ export default function Cart() {
               </div>
 
               <h4>Tổng tiền: {totalAmount() + " " + "VNĐ"} </h4>
-              <button onClick={handleConfirmOrder} className="checkout-btn">
-                Thanh toán{" "}
+              <button onClick={handleOpenDialog} className="checkout-btn">
+                Thanh toán
               </button>
             </div>
           )}
         </div>
       </div>
-        {}
-      <dialog ref={formDialog} className="payment-dialog">
 
-        {}
+      <dialog ref={formDialog} className="payment-dialog">
         <div className="dialog-header">
           <div className="dialog-header-text">
             <span className="dialog-header-sub">Xác nhận đơn hàng</span>
@@ -271,11 +304,12 @@ export default function Cart() {
           </button>
         </div>
 
-        <form className="payment-form" method="dialog">
-
+        <form
+          className="payment-form"
+          method="dialog"
+          onSubmit={handleConfirmOrder}
+        >
           <div className="dialog-content">
-
-            {}
             <div className="products-section">
               <h3>Sản phẩm đặt hàng ({selectedItems.length})</h3>
               <div className="products-table">
@@ -298,16 +332,27 @@ export default function Cart() {
                               alt={value.productId.productName}
                             />
                             <div>
-                              <p className="product-name">{value.productId.productName}</p>
-                              <p className="product-desc">{value.productId.description}</p>
-                              <p className="product-desc">{value.productId.techSpecs}</p>
+                              <p className="product-name">
+                                {value.productId.productName}
+                              </p>
+                              <p className="product-desc">
+                                {value.productId.description}
+                              </p>
+                              <p className="product-desc">
+                                {value.productId.techSpecs}
+                              </p>
                             </div>
                           </div>
                         </td>
-                        <td>{value.productId.price.toLocaleString("vi-VN")}₫</td>
+                        <td>
+                          {value.productId.price.toLocaleString("vi-VN")}₫
+                        </td>
                         <td className="quantity-cell">{value.quantity}</td>
                         <td className="total-cell">
-                          {(value.productId.price * value.quantity).toLocaleString("vi-VN")}₫
+                          {(
+                            value.productId.price * value.quantity
+                          ).toLocaleString("vi-VN")}
+                          ₫
                         </td>
                       </tr>
                     ))}
@@ -316,35 +361,74 @@ export default function Cart() {
               </div>
             </div>
 
-            {}
             <div className="form-section">
               <div className="form-section-title">Thông tin giao hàng</div>
 
               <div className="form-group">
-                <label htmlFor="fullname">Họ và tên <span className="required">*</span></label>
-                <input id="fullname" type="text" placeholder="Nguyễn Văn A" required />
+                <label htmlFor="fullname">
+                  Họ và tên <span className="required">*</span>
+                </label>
+                <input
+                  value={fullname}
+                  id="fullname"
+                  type="text"
+                  onChange={(e) => setFullname(e.target.value)}
+                  placeholder="Vui lòng nhập họ tên"
+                  required
+                />
               </div>
 
               <div className="form-group">
-                <label htmlFor="address">Địa chỉ giao hàng <span className="required">*</span></label>
-                <input id="address" type="text" placeholder="123 Lê Lợi, Quận 1, TP. Hồ Chí Minh" required />
+                <label htmlFor="address">
+                  Địa chỉ giao hàng <span className="required">*</span>
+                </label>
+                <input
+                  value={address}
+                  id="address"
+                  type="text"
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Vui lòng nhập địa chỉ"
+                  required
+                />
               </div>
 
               <div className="form-group">
-                <label htmlFor="phone">Số điện thoại <span className="required">*</span></label>
-                <input id="phone" type="tel" placeholder="0901 234 567" required />
+                <label htmlFor="phone">
+                  Số điện thoại <span className="required">*</span>
+                </label>
+                <input
+                  value={phone}
+                  id="phone"
+                  type="tel"
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Vui lòng nhập số điện thoại"
+                  required
+                />
               </div>
 
               <div className="form-group">
-                <label>Phương thức thanh toán <span className="required">*</span></label>
+                <label>
+                  Phương thức thanh toán <span className="required">*</span>
+                </label>
                 <div className="payment-methods">
                   <label className="radio-label">
-                    <input type="radio" name="paymentMethod" value="cod" defaultChecked />
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cod"
+                      defaultChecked
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                    />
                     <span className="radio-icon">🚚</span>
                     <span>Thanh toán khi nhận hàng</span>
                   </label>
                   <label className="radio-label">
-                    <input type="radio" name="paymentMethod" value="online" />
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="online"
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                    />
                     <span className="radio-icon">💳</span>
                     <span>Thanh toán trực tuyến</span>
                   </label>
@@ -352,16 +436,15 @@ export default function Cart() {
               </div>
             </div>
 
-            {}
             <div className="order-summary">
               <div className="summary-row">
                 <span>Tạm tính ({selectedItems.length} sản phẩm)</span>
                 <span className="amount">{totalAmountSelectedItems()}</span>
               </div>
-              <div className="summary-row">
+              {/* <div className="summary-row">
                 <span>Phí vận chuyển</span>
                 <span className="free-ship">Miễn phí</span>
-              </div>
+              </div> */}
               <div className="summary-row total">
                 <span>Tổng thanh toán</span>
                 <span className="amount">{totalAmountSelectedItems()}</span>
@@ -369,7 +452,6 @@ export default function Cart() {
             </div>
           </div>
 
-          {}
           <div className="dialog-actions">
             <div className="action-btns">
               <button
@@ -384,7 +466,6 @@ export default function Cart() {
               </button>
             </div>
           </div>
-
         </form>
       </dialog>
       <Footer />

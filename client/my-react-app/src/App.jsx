@@ -17,6 +17,8 @@ import DetailProduct from "./assets/pages/DetailProduct";
 import Cart from "./assets/pages/Cart"; // cart page/component
 import fetchApi from "./service/api";
 import AccessDeniedPage from "./assets/pages/AccessDeniedPage";
+import MyOrder from "./assets/pages/MyOrder";
+import MyOrderDetail from "./assets/pages/MyOrderDetail";
 
 export const api = "http://localhost:3000";
 
@@ -103,6 +105,8 @@ function App() {
         <Route path="/confirm" element={<Confirm />} />
         <Route path="product/detail" element={<DetailProduct />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/my-orders" element={<MyOrder />} />
+        <Route path="/my-orders/detail" element={<MyOrderDetail />} />
         <Route path="/access-denied" element={<AccessDeniedPage />} />
         {/* Routes cho phía Admin  */}
         <Route path="/admin" element={<HomeAdmin />}>
