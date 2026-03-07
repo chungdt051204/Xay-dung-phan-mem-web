@@ -1,0 +1,262 @@
+/* Account Page Styles */
+.account-page {
+    background-color: #f5f5f5;
+    padding: 40px 20px;
+    min-height: 100vh;
+}
+
+.account-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.account-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px;
+}
+
+.account-header h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.account-content {
+    display: flex;
+    min-height: 500px;
+}
+
+.account-sidebar {
+    flex: 0 0 280px;
+    background-color: #f9f9f9;
+    border-right: 1px solid #eee;
+    padding: 30px 20px;
+}
+
+.user-profile {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+}
+
+.user-profile h3 {
+    font-size: 1.1rem;
+    color: #333;
+    margin: 10px 0 5px;
+}
+
+.user-profile p {
+    color: #999;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.account-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.menu-item {
+    padding: 15px 15px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    color: #666;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.menu-item:hover {
+    background-color: white;
+    color: #667eea;
+}
+
+.menu-item.active {
+    background: #667eea;
+    color: white;
+}
+
+.logout-btn {
+    margin-top: 10px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+    color: #e74c3c;
+}
+
+.logout-btn:hover {
+    background-color: #ffe6e6;
+    color: #e74c3c;
+}
+
+.account-main {
+    flex: 1;
+    padding: 40px;
+}
+
+.account-section {
+    max-width: 600px;
+}
+
+.account-section h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #667eea;
+}
+
+.profile-form,
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.form-group input:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.form-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    font-weight: normal;
+    color: #666;
+}
+
+.edit-btn,
+.add-btn,
+.change-password-btn {
+    padding: 12px 24px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.3s ease;
+    align-self: flex-start;
+    margin-top: 15px;
+}
+
+.edit-btn:hover,
+.add-btn:hover,
+.change-password-btn:hover {
+    background: #764ba2;
+}
+
+.change-password-btn a {
+    color: white;
+    text-decoration: none;
+}
+
+.orders-list,
+.addresses-list {
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+}
+
+.not-logged-in {
+    text-align: center;
+    padding: 60px 40px;
+}
+
+.not-logged-in h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.not-logged-in p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.login-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background: #667eea;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+.login-btn:hover {
+    background: #764ba2;
+}
+
+@media (max-width: 768px) {
+    .account-content {
+        flex-direction: column;
+    }
+
+    .account-sidebar {
+        flex: 1;
+        border-right: none;
+        border-bottom: 1px solid #eee;
+        padding: 20px;
+    }
+
+    .account-main {
+        padding: 20px;
+    }
+
+    .account-menu {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .menu-item {
+        flex: 1;
+        min-width: 120px;
+    }
+}

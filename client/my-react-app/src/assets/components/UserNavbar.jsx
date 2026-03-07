@@ -52,10 +52,46 @@ export default function UserNavbar() {
 
           {openCategoryMenu && (
             <ul className="category-dropdown">
-              <li>📱 Điện thoại</li>
-              <li>💻 Laptop</li>
-              <li>🎧 Phụ kiện</li>
-              <li>📺 Tivi</li>
+              <li
+                onClick={() => {
+                  navigate("/?category=phone");
+                  setOpenCategoryMenu(false);
+                }}
+              >
+                📱 Điện thoại
+              </li>
+              <li
+                onClick={() => {
+                  navigate("/?category=laptop");
+                  setOpenCategoryMenu(false);
+                }}
+              >
+                💻 Laptop
+              </li>
+              <li
+                onClick={() => {
+                  navigate("/?category=tablet");
+                  setOpenCategoryMenu(false);
+                }}
+              >
+                ⌚ Máy tính bảng
+              </li>
+              <li
+                onClick={() => {
+                  navigate("/?category=headphone");
+                  setOpenCategoryMenu(false);
+                }}
+              >
+                🎧 Headphone
+              </li>
+              <li
+                onClick={() => {
+                  navigate("/?category=tivi");
+                  setOpenCategoryMenu(false);
+                }}
+              >
+                📺 Tivi
+              </li>
             </ul>
           )}
         </div>
