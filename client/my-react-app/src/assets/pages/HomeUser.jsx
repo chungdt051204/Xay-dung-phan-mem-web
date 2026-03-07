@@ -4,6 +4,7 @@ import Navbar from "../components/UserNavbar";
 import Footer from "../components/Footer";
 import ProductCategoryCard from "../components/ProductCategoryCard";
 import Banner from "../components/Banner";
+import User from "../components/User";
 
 export default function HomeUser() {
   const { products } = useContext(AppContext);
@@ -26,6 +27,7 @@ export default function HomeUser() {
   return (
     <>
       <Navbar />
+      <User />
       <Banner />
       <h2>Điện thoại</h2>
       <ProductCategoryCard data={phones} />
