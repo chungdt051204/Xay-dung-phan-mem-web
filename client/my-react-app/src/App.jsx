@@ -77,7 +77,7 @@ function App() {
     fetchApi({ url: `${api}/product`, setData: setProducts });
   }, [refresh]);
   useEffect(() => {
-    fetchApi({ url: `${api}/brand`, setData: setBrands });
+    fetchApi({ url: `${api}/brand?_limit=10`, setData: setBrands });
   }, [refresh]);
   useEffect(() => {
     fetchApi({ url: `${api}/category`, setData: setCategories });
@@ -99,6 +99,7 @@ function App() {
         isAdmin,
         products,
         brands,
+        setBrands,
         categories,
         users,
         setUsers,
