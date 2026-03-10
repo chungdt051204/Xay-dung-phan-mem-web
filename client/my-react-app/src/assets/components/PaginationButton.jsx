@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 
 const style = `
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
@@ -76,21 +76,19 @@ const style = `
   }
 `;
 
-function getPages(current, total) {
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-  if (current <= 4) return [1, 2, 3, 4, 5, "...", total];
-  if (current >= total - 3) return [1, "...", total - 4, total - 3, total - 2, total - 1, total];
-  return [1, "...", current - 1, current, current + 1, "...", total];
-}
-
-export default function Pagination({ current: controlledCurrent, totalPages = 20, onChange }) {
-  const [internalPage, setInternalPage] = useState(1);
-
-  const isControlled = controlledCurrent !== undefined && onChange !== undefined;
-  const current = isControlled ? controlledCurrent : internalPage;
-  const handleChange = isControlled ? onChange : setInternalPage;
-
-  const pages = getPages(current, totalPages);
+export default function Pagination({ totalPages }) {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const params = new URLSearchParams(searchParams);
+  const createUrl = (page) => {
+    if (page > 1) params.set("page", page);
+    else {
+      params.delete("page");
+    }
+    return params.toString();
+  };
+  const pages = [...Array(totalPages)].map((_, i) => i + 1);
+  const currentPage = searchParams.get("page") || 1;
 
   if (totalPages <= 1) return null;
 
@@ -98,44 +96,40 @@ export default function Pagination({ current: controlledCurrent, totalPages = 20
     <>
       <style>{style}</style>
       <div className="pg-container">
-        <button
-          className="pg-btn pg-arrow"
-          disabled={current === 1}
-          onClick={() => handleChange(current - 1)}
-          aria-label="Trang trước"
-        >
-          ‹
-        </button>
-
-        {pages.map((p, i) =>
-          p === "..." ? (
-            <button key={`dot-${i}`} className="pg-btn pg-dots" disabled>
-              ···
-            </button>
-          ) : (
+        <Link to={`?${createUrl(Number(currentPage) - 1)}`}>
+          <button
+            className="pg-btn pg-arrow"
+            disabled={currentPage === 1}
+            aria-label="Trang trước"
+          >
+            ‹
+          </button>
+        </Link>
+        {pages.map((p, i) => (
+          <Link to={`?${createUrl(p)}`} key={i}>
             <button
-              key={p}
-              className={`pg-btn${current === p ? " pg-active" : ""}`}
-              onClick={() => handleChange(p)}
+              className={`pg-btn${
+                Number(currentPage) === p ? " pg-active" : ""
+              }`}
               aria-label={`Trang ${p}`}
-              aria-current={current === p ? "page" : undefined}
+              aria-current={currentPage === p ? "page" : undefined}
             >
               {p}
             </button>
-          )
-        )}
-
-        <button
-          className="pg-btn pg-arrow"
-          disabled={current === totalPages}
-          onClick={() => handleChange(current + 1)}
-          aria-label="Trang sau"
-        >
-          ›
-        </button>
+          </Link>
+        ))}
+        <Link to={`?${createUrl(Number(currentPage) + 1)} `}>
+          <button
+            className="pg-btn pg-arrow"
+            disabled={Number(currentPage) === totalPages}
+            aria-label="Trang sau"
+          >
+            ›
+          </button>
+        </Link>
       </div>
       <div className="pg-info">
-        Trang <span>{current}</span> / {totalPages}
+        Trang <span>{currentPage}</span> / {totalPages}
       </div>
     </>
   );

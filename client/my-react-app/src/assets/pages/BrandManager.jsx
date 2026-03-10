@@ -6,18 +6,30 @@ import fetchApi from "../../service/api";
 import { api } from "../../App";
 import ConfirmDialog from "../components/ConfirmDialog";
 import "../style/BrandManager.css";
+import Pagination from "../components/PaginationButton";
 
 export default function BrandManager() {
-  const { brands, setRefresh } = useContext(AppContext);
+  const { brands, setBrands, setRefresh } = useContext(AppContext);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const params = new URLSearchParams(searchParams);
   const id = searchParams.get("id");
+  const page = searchParams.get("page");
   const [brandName, setBrandName] = useState("");
   const [brandWithId, setBrandWithId] = useState("");
   const [isEdit, setIsEdit] = useState(false);
   const formDialog = useRef();
   const confirmDialog = useRef();
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (page) {
+      params.append("_page", page);
+    }
+    fetchApi({
+      url: `${api}/brand?${params.toString()}&_limit=10`,
+      setData: setBrands,
+    });
+  }, [page, setBrands]);
   useEffect(() => {
     if (id) {
       setIsEdit(true);
@@ -200,7 +212,7 @@ export default function BrandManager() {
               </tr>
             </thead>
             <tbody>
-              {brands?.map((brand, index) => (
+              {brands?.docs?.map((brand, index) => (
                 <tr key={brand._id}>
                   <td>{index + 1}</td>
                   <td>{brand.brandName}</td>
@@ -222,6 +234,7 @@ export default function BrandManager() {
               ))}
             </tbody>
           </table>
+          <Pagination totalPages={brands?.totalPages} />
         </div>
 
         <ConfirmDialog
