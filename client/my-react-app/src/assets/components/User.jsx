@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import UserNavbar from "./UserNavbar";
+import Footer from "./Footer";
 
 export default function User() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const id = searchParams.get("id");
+  const ID = searchParams.get("id");
   const params = new URLSearchParams(searchParams);
   const [refresh, setRefresh] = useState(0);
   const [users, setUsers] = useState([]);
   const [userWithID, setUserWithID] = useState(null);
-  const [ID, setID] = useState("");
-  const [Name, setName] = useState("");
+  const [id, setId] = useState("");
+  const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [isEdit, setIsEdit] = useState(false);
   const formDialog = useRef();
@@ -32,9 +34,9 @@ export default function User() {
       });
   }, [refresh]);
   useEffect(() => {
-    if (id) {
+    if (ID) {
       setIsEdit(true);
-      fetch(`http://localhost:3000/users?ID=${id}`)
+      fetch(`http://localhost:3000/users/${ID}`)
         .then((res) => {
           if (res.ok) return res.json();
           throw res;
@@ -49,14 +51,14 @@ export default function User() {
         });
     } else {
       setIsEdit(false);
-      setID("");
+      setId("");
       setName("");
     }
-  }, [id]);
+  }, [ID]);
   useEffect(() => {
     if (userWithID !== null) {
-      setID(userWithID?.ID);
-      setName(userWithID?.Name);
+      setId(userWithID?.id);
+      setName(userWithID?.name);
       formDialog.current.showModal();
     } else formDialog.current.close();
   }, [userWithID]);
@@ -67,7 +69,7 @@ export default function User() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ID: ID, Name: Name }),
+      body: JSON.stringify({ id: id, name: name }),
     })
       .then((res) => {
         if (res.ok) return res.json();
@@ -76,6 +78,8 @@ export default function User() {
       .then(({ message }) => {
         toast.success(message);
         formDialog.current.close();
+        setId("");
+        setName("");
         setRefresh((prev) => prev + 1);
       })
       .catch(async (err) => {
@@ -85,8 +89,8 @@ export default function User() {
         }
       });
   };
-  const handleDelete = (ID) => {
-    fetch(`http://localhost:3000/users?ID=${ID}`, {
+  const handleDelete = (id) => {
+    fetch(`http://localhost:3000/users?id=${id}`, {
       method: "DELETE",
     })
       .then((res) => {
@@ -102,20 +106,20 @@ export default function User() {
         console.log(message);
       });
   };
-  const handleOpenDialog = (ID) => {
+  const handleOpenDialog = (id) => {
     setIsEdit(true);
-    params.set("id", ID);
+    params.set("id", id);
     navigate(`?${params.toString()}`);
     formDialog.current.showModal();
   };
   const handleUpdate = (e) => {
     e.preventDefault();
-    fetch(`http://localhost:3000/users?ID=${id}`, {
+    fetch(`http://localhost:3000/users?id=${ID}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Name: Name }),
+      body: JSON.stringify({ name: name }),
     })
       .then((res) => {
         if (res.ok) return res.json();
@@ -140,6 +144,7 @@ export default function User() {
   };
   return (
     <>
+      <UserNavbar />
       <h2>Danh sách người dùng</h2>
       <button
         onClick={() => {
@@ -160,11 +165,11 @@ export default function User() {
           {users?.map((value) => {
             return (
               <tr key={value._id}>
-                <td>{value.ID}</td>
-                <td>{value.Name}</td>
+                <td>{value.id}</td>
+                <td>{value.name}</td>
                 <td>
-                  <button onClick={() => handleDelete(value.ID)}>Xóa</button>
-                  <button onClick={() => handleOpenDialog(value.ID)}>
+                  <button onClick={() => handleDelete(value.id)}>Xóa</button>
+                  <button onClick={() => handleOpenDialog(value.id)}>
                     Sửa
                   </button>
                 </td>
@@ -180,8 +185,11 @@ export default function User() {
           <input
             disabled={isEdit ? true : false}
             type="text"
-            value={ID}
-            onChange={(e) => setID(e.target.value)}
+            value={id}
+            onChange={(e) => {
+              setId(e.target.value);
+              setError("");
+            }}
             placeholder="Mời nhập ID"
             required
           />
@@ -190,7 +198,7 @@ export default function User() {
           Name:
           <input
             type="text"
-            value={Name}
+            value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Mời nhập Name"
             required
@@ -210,6 +218,7 @@ export default function User() {
           />
         </form>
       </dialog>
+      <Footer />
     </>
   );
 }

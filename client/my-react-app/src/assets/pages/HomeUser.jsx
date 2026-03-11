@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import AppContext from "../components/AppContext";
 import Navbar from "../components/UserNavbar";
 import Footer from "../components/Footer";
@@ -26,7 +26,7 @@ export default function HomeUser() {
         const categoryName = categoryMap[category];
         if (categoryName) {
           const element = document.getElementById(
-            categoryName.replace(/\s+/g, "-").toLowerCase(),
+            categoryName.replace(/\s+/g, "-").toLowerCase()
           );
           if (element) {
             element.scrollIntoView({ behavior: "smooth" });
@@ -36,25 +36,27 @@ export default function HomeUser() {
     }
   }, [searchParams]);
   const phones = products?.docs?.filter(
-    (value) => value.categoryId.categoryName === "Điện thoại",
+    (value) => value.categoryId.categoryName === "Điện thoại"
   );
   console.log(phones);
   const laptops = products?.docs?.filter(
-    (value) => value.categoryId.categoryName === "Laptop",
+    (value) => value.categoryId.categoryName === "Laptop"
   );
   const ipads = products?.docs?.filter(
-    (value) => value.categoryId.categoryName === "Máy tính bảng",
+    (value) => value.categoryId.categoryName === "Máy tính bảng"
   );
   const headphones = products?.docs?.filter(
-    (value) => value.categoryId.categoryName === "Headphone",
+    (value) => value.categoryId.categoryName === "Headphone"
   );
   const televisions = products?.docs?.filter(
-    (value) => value.categoryId.categoryName === "TV",
+    (value) => value.categoryId.categoryName === "TV"
   );
   return (
     <>
       <Navbar />
-      <User />
+      <Link to="/users">
+        <a>Bấm vào đây để test chủ đề 2</a>
+      </Link>
       <Banner />
       <h2 id="điện-thoại">Điện thoại</h2>
       <ProductCategoryCard data={phones} />
