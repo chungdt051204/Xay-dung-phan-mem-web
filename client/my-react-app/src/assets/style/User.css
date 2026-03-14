@@ -1,0 +1,142 @@
+.user-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+h2 {
+  color: #d32f2f;
+  margin-bottom: 20px;
+}
+
+.btn-add {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 15px;
+  transition: background 0.3s;
+}
+
+.btn-add:hover {
+  background-color: #b71c1c;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background-color: white;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+table th {
+  background-color: #f8f9fa;
+  color: #333;
+  font-weight: bold;
+  padding: 12px;
+  text-align: left;
+  border-bottom: 2px solid #eee;
+}
+
+table th:nth-child(1),
+table td:nth-child(1),
+table th:nth-child(3),
+table td:nth-child(3) {
+  width: 1%;
+  white-space: nowrap;
+}
+
+table th:nth-child(2),
+table td:nth-child(2) {
+  width: auto;
+}
+
+table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+table tr:hover {
+  background-color: #fff5f5; /* Highlight nhẹ khi hover dòng */
+}
+
+.btn-action {
+  padding: 6px 12px;
+  margin-right: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  background: white;
+  transition: all 0.2s;
+}
+
+.btn-delete {
+  color: #d32f2f;
+  border-color: #d32f2f;
+}
+
+.btn-delete:hover {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.btn-edit {
+  color: #1976d2;
+  border-color: #1976d2;
+}
+
+.btn-edit:hover {
+  background-color: #1976d2;
+  color: white;
+}
+
+dialog {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  padding: 25px;
+  width: 350px;
+  margin: auto;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+dialog h3 {
+  margin-top: 0;
+  color: #d32f2f;
+}
+
+form input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Giúp padding không làm tràn input */
+}
+
+.btn-save {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background-color: #666;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  margin-left: 10px;
+  cursor: pointer;
+}

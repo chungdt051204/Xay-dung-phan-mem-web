@@ -5,7 +5,7 @@ import Navbar from "../components/UserNavbar";
 import Footer from "../components/Footer";
 import ProductCategoryCard from "../components/ProductCategoryCard";
 import Banner from "../components/Banner";
-import User from "../components/User";
+import User from "./User";
 
 export default function HomeUser() {
   const { products } = useContext(AppContext);

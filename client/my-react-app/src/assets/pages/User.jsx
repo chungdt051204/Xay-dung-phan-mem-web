@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import UserNavbar from "./UserNavbar";
-import Footer from "./Footer";
+import UserNavbar from "../components/UserNavbar";
+import Footer from "../components/Footer";
+import "../style/User.css";
 
 export default function User() {
   const navigate = useNavigate();
@@ -145,79 +146,92 @@ export default function User() {
   return (
     <>
       <UserNavbar />
-      <h2>Danh sách người dùng</h2>
-      <button
-        onClick={() => {
-          formDialog.current.showModal();
-        }}
-      >
-        Thêm người dùng
-      </button>
-      <table border={1} cellSpacing={0}>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users?.map((value) => {
-            return (
-              <tr key={value._id}>
-                <td>{value.id}</td>
-                <td>{value.name}</td>
-                <td>
-                  <button onClick={() => handleDelete(value.id)}>Xóa</button>
-                  <button onClick={() => handleOpenDialog(value.id)}>
-                    Sửa
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <dialog ref={formDialog}>
-        <h3>{isEdit ? "Sửa thông tin người dùng" : "Thêm người dùng"}</h3>
-        <form onSubmit={isEdit ? handleUpdate : handleCreate}>
-          ID:
-          <input
-            disabled={isEdit ? true : false}
-            type="text"
-            value={id}
-            onChange={(e) => {
-              setId(e.target.value);
-              setError("");
-            }}
-            placeholder="Mời nhập ID"
-            required
-          />
-          <span style={{ color: "red" }}>{error && error}</span>
-          <br />
-          Name:
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Mời nhập Name"
-            required
-          />
-          <button>Lưu</button>
-          <input
-            onClick={() => {
-              setSearchParams((prev) => {
-                const newParams = new URLSearchParams(prev);
-                if (newParams.has("id")) newParams.delete("id");
-                return newParams;
-              });
-              formDialog.current.close();
-            }}
-            type="button"
-            value="Hủy"
-          />
-        </form>
-      </dialog>
+      <div className="user-container">
+        <h2>Danh sách người dùng</h2>
+        <button
+          className="btn-add"
+          onClick={() => {
+            formDialog.current.showModal();
+          }}
+        >
+          Thêm người dùng
+        </button>
+        <table border={1} cellSpacing={0}>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users?.map((value) => {
+              return (
+                <tr key={value._id}>
+                  <td>{value.id}</td>
+                  <td>{value.name}</td>
+                  <td>
+                    <button
+                      className="btn-action btn-delete"
+                      onClick={() => handleDelete(value.id)}
+                    >
+                      Xóa
+                    </button>
+                    <button
+                      className="btn-action btn-edit"
+                      onClick={() => handleOpenDialog(value.id)}
+                    >
+                      Sửa
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <dialog ref={formDialog}>
+          <h3>{isEdit ? "Sửa thông tin người dùng" : "Thêm người dùng"}</h3>
+          <form onSubmit={isEdit ? handleUpdate : handleCreate}>
+            ID:
+            <input
+              disabled={isEdit ? true : false}
+              type="text"
+              value={id}
+              onChange={(e) => {
+                setId(e.target.value);
+                setError("");
+              }}
+              placeholder="Mời nhập ID"
+              required
+            />
+            <span style={{ color: "red" }}>{error && error}</span>
+            <br />
+            Name:
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Mời nhập Name"
+              required
+            />
+            <button className="btn-save">Lưu</button>
+            <input
+              className="btn-cancel"
+              onClick={() => {
+                setSearchParams((prev) => {
+                  const newParams = new URLSearchParams(prev);
+                  if (newParams.has("id")) newParams.delete("id");
+                  return newParams;
+                });
+                formDialog.current.close();
+              }}
+              type="button"
+              value="Hủy"
+            />
+          </form>
+        </dialog>
+      </div>
+
       <Footer />
     </>
   );

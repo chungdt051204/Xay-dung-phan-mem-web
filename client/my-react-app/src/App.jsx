@@ -27,7 +27,7 @@ import Account from "./assets/pages/Account";
 import Checkout from "./assets/pages/Checkout";
 import Wishlist from "./assets/pages/Wishlist";
 import Orders from "./assets/pages/Orders";
-import User from "./assets/components/User";
+import User from "./assets/pages/User";
 
 export const api = "http://localhost:3000";
 
