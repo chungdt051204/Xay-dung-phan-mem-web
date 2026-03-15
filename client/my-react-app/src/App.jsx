@@ -28,6 +28,7 @@ import Checkout from "./assets/pages/Checkout";
 import Wishlist from "./assets/pages/Wishlist";
 import Orders from "./assets/pages/Orders";
 import User from "./assets/pages/User";
+import ChatBot from "./assets/components/ChatBot";
 
 export const api = "http://localhost:3000";
 
@@ -109,7 +110,15 @@ function App() {
       <Routes>
         {/* Routes cho phía User */}
         <Route path="/users" element={<User />} />
-        <Route path="/" element={<HomeUser />} />
+        <Route
+          path="/"
+          element={
+            <>
+              <HomeUser />
+              <ChatBot />
+            </>
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/password" element={<Password />} />
