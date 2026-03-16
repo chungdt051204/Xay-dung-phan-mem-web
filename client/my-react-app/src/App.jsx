@@ -85,7 +85,7 @@ function App() {
     fetchApi({ url: `${api}/category`, setData: setCategories });
   }, [refresh]);
   useEffect(() => {
-    fetchApi({ url: `${api}/user`, setData: setUsers });
+    fetchApi({ url: `${api}/user?_limit=5`, setData: setUsers });
   }, [refresh]);
 
   return (

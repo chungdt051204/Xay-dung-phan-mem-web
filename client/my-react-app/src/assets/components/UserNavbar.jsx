@@ -126,7 +126,9 @@ export default function UserNavbar() {
             <img
               src={me.avatar}
               alt="avatar"
-              className="user-avatar"
+              style={{ borderRadius: "50%" }}
+              width={50}
+              height={50}
               referrerPolicy="no-referrer"
               onClick={() => setOpenUserMenu((prev) => !prev)}
             />

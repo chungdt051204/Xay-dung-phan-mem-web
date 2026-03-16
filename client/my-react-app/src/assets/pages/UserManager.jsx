@@ -6,12 +6,14 @@ import { toast } from "react-toastify";
 import { api } from "../../App";
 import ConfirmDialog from "../components/ConfirmDialog";
 import "../style/UserManager.css";
+import Pagination from "../components/PaginationButton";
 
 export default function UserManager() {
   const { refresh, setRefresh, users, setUsers } = useContext(AppContext);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const params = new URLSearchParams(searchParams);
+  const page = searchParams.get("page");
   const role = searchParams.get("role");
   const id = searchParams.get("id");
   const [userWithId, setUserWithId] = useState("");
@@ -33,12 +35,13 @@ export default function UserManager() {
   const confirmDialog = useRef();
   useEffect(() => {
     const params = new URLSearchParams();
+    if (page) params.append("_page", page);
     if (role) params.append("role", role);
     fetchApi({
-      url: `${api}/user?${params.toString()}`,
+      url: `${api}/user?${params.toString()}&_limit=5`,
       setData: setUsers,
     });
-  }, [role, setUsers, refresh]);
+  }, [role, setUsers, refresh, page]);
   useEffect(() => {
     if (id) {
       fetchApi({
@@ -164,12 +167,22 @@ export default function UserManager() {
                 </td>
                 <td>{value.email}</td>
                 <td>
-                  <span className={`badge ${value.roles === "admin" ? "badge-admin" : "badge-user"}`}>
+                  <span
+                    className={`badge ${
+                      value.roles === "admin" ? "badge-admin" : "badge-user"
+                    }`}
+                  >
                     {value.roles}
                   </span>
                 </td>
                 <td>
-                  <span className={`badge ${value.status === "active" ? "badge-active" : "badge-inactive"}`}>
+                  <span
+                    className={`badge ${
+                      value.status === "active"
+                        ? "badge-active"
+                        : "badge-inactive"
+                    }`}
+                  >
                     {value.status}
                   </span>
                 </td>
@@ -196,6 +209,7 @@ export default function UserManager() {
           })}
         </tbody>
       </table>
+      <Pagination totalPages={users?.totalPages} />
       <dialog className="UserManager-dialog" ref={formDialog}>
         <form className="user-detail">
           <img
@@ -248,7 +262,13 @@ export default function UserManager() {
               readOnly
               value={formUser.isVerified ? "Đã xác thực" : "Chưa xác thực"}
             />
-            <div style={{ gridColumn: "1 / -1", textAlign: "right", marginTop: "10px" }}>
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                textAlign: "right",
+                marginTop: "10px",
+              }}
+            >
               <button
                 type="button"
                 onClick={() => {
@@ -265,13 +285,12 @@ export default function UserManager() {
                   border: "none",
                   background: "#e74c3c",
                   color: "white",
-                  cursor: "pointer"
+                  cursor: "pointer",
                 }}
               >
                 Thoát
               </button>
             </div>
-
           </div>
         </form>
       </dialog>

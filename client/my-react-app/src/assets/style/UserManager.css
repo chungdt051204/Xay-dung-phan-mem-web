@@ -120,7 +120,7 @@
   background: #e67e22;
 }
 
-.UserManager-dialog{
+.UserManager-dialog {
   border: none;
   border-radius: 16px;
   padding: 25px;
@@ -180,8 +180,8 @@
   padding: 25px;
   width: 700px;
   max-width: 90%;
-  
-  margin: auto;  
+
+  margin: auto;
 }
 
 .UserManager-dialog::backdrop {
