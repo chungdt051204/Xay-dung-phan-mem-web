@@ -142,6 +142,7 @@ export default function UserManager() {
       <table className="user-table">
         <thead>
           <tr>
+            <th>Avatar</th>
             <th>Người dùng</th>
             <th>Email</th>
             <th>Vai trò</th>
@@ -151,21 +152,19 @@ export default function UserManager() {
           </tr>
         </thead>
         <tbody>
-          {users?.docs?.map((value) => {
-            return (
-              <tr key={value._id}>
-                <td>
-                  <div className="user-info">
-                    <img
-                      src={value.avatar}
-                      alt=""
-                      className="user-avatar"
-                      referrerPolicy="no-referrer"
-                    />
-                    <span>{value.fullname}</span>
-                  </div>
-                </td>
-                <td>{value.email}</td>
+  {users?.docs?.map((value) => {
+    return (
+      <tr key={value._id}>
+        <td>
+          <img
+            src={value.avatar}
+            alt=""
+            className="user-avatar"
+            referrerPolicy="no-referrer"
+          />
+        </td>
+        <td>{value.fullname}</td>
+        <td>{value.email}</td>
                 <td>
                   <span
                     className={`badge ${

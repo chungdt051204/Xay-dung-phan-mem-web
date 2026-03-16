@@ -54,14 +54,15 @@
 .user-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .user-avatar {
-  width: 45px;
-  height: 45px;
-  border-radius: 10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #f0f2f5;
 }
 
 .badge {
@@ -250,4 +251,8 @@
 
 .btn-confirm:hover {
   background: #c0392b;
+}
+
+.user-table td:first-child {
+  min-width: 220px;
 }

@@ -6,7 +6,7 @@ import UserNavbar from "../components/UserNavbar";
 import { useNavigate } from "react-router-dom";
 import fetchApi from "../../service/api";
 import { api } from "../../App";
-
+import "../style/MyOrder.css";
 export default function MyOrder() {
   const { isLoading, isLogin, refresh, setRefresh, me } =
     useContext(AppContext);
@@ -33,42 +33,53 @@ export default function MyOrder() {
   return (
     <>
       <UserNavbar />
-      <h2>Đơn hàng của tôi</h2>
-      <table border={1} cellSpacing={0}>
-        <thead>
-          <tr>
-            <th>Mã đơn</th>
-            <th>Tổng tiền</th>
-            <th>Phương thức thanh toán</th>
-            <th>Trạng thái</th>
-            <th>Trạng thái thanh toán</th>
-            <th>Ngày tạo</th>
-            <th>Hành động</th>
+     <div className="order-wrap">
+  <div className="order-header">
+    <h2>Đơn hàng của tôi</h2>
+  </div>
+  <div className="order-table-wrapper">
+    <table className="order-table">
+      <thead>
+        <tr>
+          <th style={{width:'22%'}}>Mã đơn</th>
+          <th style={{width:'13%'}}>Tổng tiền</th>
+          <th style={{width:'13%'}}>Thanh toán</th>
+          <th style={{width:'13%'}}>Trạng thái</th>
+          <th style={{width:'13%'}}>TT thanh toán</th>
+          <th style={{width:'13%'}}>Ngày tạo</th>
+          <th style={{width:'13%'}}>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        {myOrders?.docs?.map((value) => (
+          <tr key={value._id}>
+            <td><span className="order-id">{value._id}</span></td>
+            <td><strong>{value.totalAmount.toLocaleString()} VNĐ</strong></td>
+            <td>{value.paymentMethod}</td>
+            <td>
+              <span className={`badge ${
+                value.status === 'Chờ xác nhận' ? 'badge-pending' :
+                value.status === 'Đã xác nhận'  ? 'badge-confirmed' : 'badge-cancelled'
+              }`}>{value.status}</span>
+            </td>
+            <td>
+              <span className={`badge ${value.paymentStatus === 'Đã thanh toán' ? 'badge-paid' : 'badge-unpaid'}`}>
+                {value.paymentStatus}
+              </span>
+            </td>
+            <td style={{fontSize:'12px', color:'#888'}}>{new Date(value.createdAt).toLocaleDateString('vi-VN')}</td>
+            <td>
+              {value.status === 'Chờ xác nhận' && <button className="btn-cancel">Hủy</button>}
+              <Link to={`/my-orders/detail?orderId=${value._id}`}>
+                <button className="btn-detail">Chi tiết</button>
+              </Link>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {myOrders?.docs?.map((value) => {
-            return (
-              <tr key={value._id}>
-                <td>{value._id}</td>
-                <td>{value.totalAmount + " " + "VNĐ"}</td>
-                <td>{value.paymentMethod}</td>
-                <td>{value.status}</td>
-                <td>{value.paymentStatus}</td>
-                <td>{value.createdAt}</td>
-                <td>
-                  {value.status === "Chờ xác nhận" && (
-                    <button>Hủy đơn hàng</button>
-                  )}
-                  <Link to={`/my-orders/detail?orderId=${value._id}`}>
-                    <button>Xem chi tiết</button>
-                  </Link>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
       <Footer />
     </>
   );

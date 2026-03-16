@@ -5,7 +5,7 @@ import fetchApi from "../../service/api";
 import { api } from "../../App";
 import UserNavbar from "../components/UserNavbar";
 import Footer from "../components/Footer";
-
+import "../style/MyOrderDetail.css";
 export default function MyOrderDetail() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,73 +36,91 @@ export default function MyOrderDetail() {
   useEffect(() => {
     console.log(myOrderDetail);
   }, [myOrderDetail]);
-  return (
-    <>
-      <UserNavbar />
-      <h2>Chi tiết đơn hàng</h2>
-      <h3>Thông tin đặt hàng</h3>
-      <p>
-        <b>Họ và tên:</b>
-        {myOrderDetail?.fullname}
-      </p>
-      <p>
-        <b>Địa chỉ:</b>
-        {myOrderDetail?.address}
-      </p>
-      <p>
-        <b>Số điện thoại:</b>
-        {myOrderDetail?.phone}
-      </p>
-      <br />
-      <h3>Tình trạng đơn hàng</h3>
-      <div style={{ display: "flex", gap: "5px" }}>
-        <p>
-          {new Date(myOrderDetail?.createdAt).toLocaleDateString() +
-            " " +
-            new Date(myOrderDetail?.createdAt).toLocaleTimeString()}
-        </p>
-        <p>
-          {myOrderDetail?.status === "Chờ xác nhận"
-            ? "Đơn hàng đang chờ xác nhận"
-            : ""}
-        </p>
+ return (
+  <>
+    <UserNavbar />
+    <div className="od-wrap">
+      <h2 className="od-title">Chi tiết đơn hàng</h2>
+      <div className="od-grid">
+        <div className="od-card">
+          <p className="od-card-title">Thông tin đặt hàng</p>
+          <div className="od-row"><span className="od-label">Họ và tên</span><span className="od-value">{myOrderDetail?.fullname}</span></div>
+          <div className="od-row"><span className="od-label">Số điện thoại</span><span className="od-value">{myOrderDetail?.phone}</span></div>
+          <div className="od-row"><span className="od-label">Địa chỉ</span><span className="od-value">{myOrderDetail?.address}</span></div>
+        </div>
+
+        <div className="od-card">
+          <p className="od-card-title">Tình trạng đơn hàng</p>
+          <div className="od-row">
+            <span className="od-label">Trạng thái</span>
+            <span className={`badge ${myOrderDetail?.status === 'Chờ xác nhận' ? 'badge-pending' : myOrderDetail?.status === 'Đã xác nhận' ? 'badge-confirmed' : 'badge-cancelled'}`}>
+              {myOrderDetail?.status}
+            </span>
+          </div>
+          <div className="od-row"><span className="od-label">Thanh toán</span><span className="od-value">{myOrderDetail?.paymentMethod}</span></div>
+          <div className="od-row">
+            <span className="od-label">TT thanh toán</span>
+            <span className={`badge ${myOrderDetail?.paymentStatus === 'Đã thanh toán' ? 'badge-paid' : 'badge-unpaid'}`}>
+              {myOrderDetail?.paymentStatus}
+            </span>
+          </div>
+          <div className="od-timeline">
+            <div className="od-dot" />
+            <div>
+              <p className="od-timeline-text">
+                {myOrderDetail?.status === 'Chờ xác nhận' ? 'Đơn hàng đang chờ xác nhận' : myOrderDetail?.status}
+              </p>
+              <p className="od-timeline-date">
+                {new Date(myOrderDetail?.createdAt).toLocaleDateString('vi-VN')} · {new Date(myOrderDetail?.createdAt).toLocaleTimeString('vi-VN')}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-      <br />
-      <h3>Danh sách sản phẩm</h3>
-      <table border={1} cellSpacing={0}>
-        <thead>
-          <tr>
-            <th>Sản phẩm</th>
-            <th>Đơn giá</th>
-            <th>Số lượng</th>
-            <th>Thành tiền</th>
-          </tr>
-        </thead>
-        <tbody>
-          {myOrderDetail?.items?.map((value) => {
-            return (
+
+      <div className="od-card">
+        <p className="od-card-title">Danh sách sản phẩm</p>
+        <table className="od-product-table">
+          <thead>
+            <tr>
+              <th style={{width:'50%'}}>Sản phẩm</th>
+              <th>Đơn giá</th>
+              <th style={{textAlign:'center'}}>Số lượng</th>
+              <th style={{textAlign:'right'}}>Thành tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+            {myOrderDetail?.items?.map((value) => (
               <tr key={value._id}>
                 <td>
-                  <img
-                    src={value.productId.image}
-                    alt=""
-                    width={80}
-                    height={100}
-                  />
-                  <p>{value.productId.productName}</p>
-                  <p>{value.productId.description}</p>
-                  <p>{value.productId.techSpecs}</p>
+                  <div className="product-cell">
+                    <img src={value.productId.image} alt="" className="product-img" />
+                    <div>
+                      <p className="product-name">{value.productId.productName}</p>
+                      <p className="product-desc">{value.productId.description}</p>
+                    </div>
+                  </div>
                 </td>
-                <td>{`${value.productId.price} VNĐ`}</td>
-                <td>{value.quantity}</td>
-                <td>{`${value.amount} VNĐ`}</td>
+                <td>{value.productId.price.toLocaleString()} VNĐ</td>
+                <td style={{textAlign:'center'}}>{value.quantity}</td>
+                <td style={{textAlign:'right', fontWeight:600}}>{value.amount.toLocaleString()} VNĐ</td>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <h3>Tổng tiền: {`${myOrderDetail?.totalAmount} VNĐ`}</h3>
-      <Footer />
-    </>
-  );
+            ))}
+          </tbody>
+        </table>
+        <div className="od-total-bar">
+          <span className="od-total-label">Tổng cộng</span>
+          <span className="od-total-value">{myOrderDetail?.totalAmount?.toLocaleString()} VNĐ</span>
+        </div>
+      </div>
+
+      {myOrderDetail?.status === 'Chờ xác nhận' && (
+        <div style={{display:'flex', justifyContent:'flex-end'}}>
+          <button className="btn-cancel">Hủy đơn hàng</button>
+        </div>
+      )}
+    </div>
+    <Footer />
+  </>
+);
 }
