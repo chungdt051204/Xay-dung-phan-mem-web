@@ -107,6 +107,7 @@ export default function UserManager() {
     fetch(`${api}/admin/user?id=${userWithId._id}`, {
       method: "PUT",
       headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ status: status }),
@@ -152,19 +153,19 @@ export default function UserManager() {
           </tr>
         </thead>
         <tbody>
-  {users?.docs?.map((value) => {
-    return (
-      <tr key={value._id}>
-        <td>
-          <img
-            src={value.avatar}
-            alt=""
-            className="user-avatar"
-            referrerPolicy="no-referrer"
-          />
-        </td>
-        <td>{value.fullname}</td>
-        <td>{value.email}</td>
+          {users?.docs?.map((value) => {
+            return (
+              <tr key={value._id}>
+                <td>
+                  <img
+                    src={value.avatar}
+                    alt=""
+                    className="user-avatar"
+                    referrerPolicy="no-referrer"
+                  />
+                </td>
+                <td>{value.fullname}</td>
+                <td>{value.email}</td>
                 <td>
                   <span
                     className={`badge ${
@@ -212,7 +213,7 @@ export default function UserManager() {
       <dialog className="UserManager-dialog" ref={formDialog}>
         <form className="user-detail">
           <img
-            src={formUser.avatar}
+            src={formUser.avatar || null}
             alt=""
             className="user-avatar"
             referrerPolicy="no-referrer"

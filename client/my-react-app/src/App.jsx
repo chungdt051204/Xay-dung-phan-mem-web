@@ -63,8 +63,8 @@ function App() {
         if (res.ok) return res.json();
         throw res;
       })
-      .then(({ data }) => {
-        setMe(data);
+      .then(({ result }) => {
+        setMe(result);
         setIsLogin(true);
       })
       .finally(() => {

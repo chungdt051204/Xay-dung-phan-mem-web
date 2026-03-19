@@ -1,5 +1,8 @@
 const fetchApi = ({ url, setData }) => {
-  fetch(`${url}`)
+  let headers = {};
+  const token = localStorage.getItem("token");
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  fetch(`${url}`, { headers })
     .then((res) => {
       if (res.ok) return res.json();
       throw res;

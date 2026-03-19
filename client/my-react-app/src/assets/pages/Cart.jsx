@@ -56,7 +56,7 @@ export default function Cart() {
 
   useEffect(() => {
     if (me) {
-      fetchApi({ url: `${api}/cart?userId=${me?._id}`, setData: setMyCart });
+      fetchApi({ url: `${api}/cart`, setData: setMyCart });
     }
   }, [me, refresh]);
 
@@ -86,6 +86,7 @@ export default function Cart() {
       fetch(`${api}/cart?userId=${me?._id}&action=decrease`, {
         method: "PUT",
         headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ itemId: item._id }),
@@ -108,6 +109,7 @@ export default function Cart() {
     fetch(`${api}/cart?userId=${me?._id}&action=increase`, {
       method: "PUT",
       headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ itemId: item._id }),
@@ -126,8 +128,11 @@ export default function Cart() {
       });
   };
   const handleDelete = (id) => {
-    fetch(`${api}/cart?userId=${me?._id}&itemId=${id}`, {
+    fetch(`${api}/cart?itemId=${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     })
       .then((res) => {
         if (res.ok) return res.json();
@@ -144,9 +149,10 @@ export default function Cart() {
   };
   const handleDeleteAll = () => {
     if (itemIdsSelected.length > 0) {
-      fetch(`${api}/cart?userId=${me?._id}`, {
+      fetch(`${api}/cart`, {
         method: "DELETE",
         headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ itemIds: itemIdsSelected }),
@@ -241,6 +247,7 @@ export default function Cart() {
                         style={{ width: "25px" }}
                         type="text"
                         value={item.quantity}
+                        readOnly
                       />
                       <button onClick={() => handleIncreaseQuantity(item)}>
                         +

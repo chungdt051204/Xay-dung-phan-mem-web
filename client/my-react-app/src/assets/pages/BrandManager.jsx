@@ -17,6 +17,7 @@ export default function BrandManager() {
   const page = searchParams.get("page");
   const [brandName, setBrandName] = useState("");
   const [brandWithId, setBrandWithId] = useState("");
+  const [err, setErr] = useState("");
   const [isEdit, setIsEdit] = useState(false);
   const formDialog = useRef();
   const confirmDialog = useRef();
@@ -92,8 +93,10 @@ export default function BrandManager() {
         setRefresh((prev) => prev + 1);
       })
       .catch(async (err) => {
-        const { message } = await err.json();
-        console.log(message);
+        if (err.status === 409) {
+          const { message } = await err.json();
+          setErr(message);
+        }
       });
   };
 
@@ -146,8 +149,10 @@ export default function BrandManager() {
         setRefresh((prev) => prev + 1);
       })
       .catch(async (err) => {
-        const { message } = await err.json();
-        console.log(message);
+        if (err.status === 409) {
+          const { message } = await err.json();
+          setErr(message);
+        }
       });
   };
 
@@ -181,7 +186,7 @@ export default function BrandManager() {
               onChange={(e) => setBrandName(e.target.value)}
               required
             />
-
+            {err && <span style={{ color: "red" }}>{err}</span>}
             <div className="dialog-actions">
               <button
                 type="button"

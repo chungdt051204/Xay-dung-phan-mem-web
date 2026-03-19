@@ -38,7 +38,7 @@ export default function HomeUser() {
   const phones = products?.docs?.filter(
     (value) => value.categoryId.categoryName === "Điện thoại"
   );
-  console.log(phones);
+
   const laptops = products?.docs?.filter(
     (value) => value.categoryId.categoryName === "Laptop"
   );
@@ -54,9 +54,7 @@ export default function HomeUser() {
   return (
     <>
       <Navbar />
-      <Link to="/users">
-        <a>Bấm vào đây để test chủ đề 2</a>
-      </Link>
+      <Link to="/users">Bấm vào đây để test chủ đề 2</Link>
       <Banner />
       <h2 id="điện-thoại">Điện thoại</h2>
       <ProductCategoryCard data={phones} />

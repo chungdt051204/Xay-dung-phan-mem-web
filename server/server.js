@@ -1,4 +1,3 @@
-require("dns").setDefaultResultOrder("ipv4first");
 const connectDB = require("./config/connectDB");
 const userEntity = require("./model/user.model");
 require("dotenv").config();

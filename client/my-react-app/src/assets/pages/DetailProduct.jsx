@@ -30,6 +30,7 @@ export default function DetailProduct() {
       fetch(`${api}/cart`, {
         method: "POST",
         headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
