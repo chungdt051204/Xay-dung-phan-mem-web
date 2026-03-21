@@ -10,6 +10,8 @@ export default function ProductCategoryCard({ data }) {
           flexWrap: "wrap",
           gap: "16px",
           padding: "16px",
+          justifyContent: "center",
+          alignItems: "flex-start",
         }}
       >
         {data?.length > 0 ? (
