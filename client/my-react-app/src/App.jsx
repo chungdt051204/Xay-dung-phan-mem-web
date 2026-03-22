@@ -29,6 +29,7 @@ import Wishlist from "./assets/pages/Wishlist";
 import Orders from "./assets/pages/Orders";
 import User from "./assets/pages/User";
 import ChatBot from "./assets/components/ChatBot";
+import MyProfile from "./assets/pages/MyProfile";
 
 export const api = "http://localhost:3000";
 
@@ -43,6 +44,7 @@ function App() {
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
   const [users, setUsers] = useState([]);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const token = searchParams.get("token");
@@ -105,6 +107,7 @@ function App() {
         categories,
         users,
         setUsers,
+        token,
       }}
     >
       <Routes>
