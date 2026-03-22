@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import UserNavbar from "../components/UserNavbar";
 import Footer from "../components/Footer";
 import "../style/User.css";
+import { api } from "../../App";
 
 export default function User() {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ export default function User() {
   const formDialog = useRef();
 
   useEffect(() => {
-    fetch("http://localhost:3000/users")
+    fetch(`${api}/users`)
       .then((res) => {
         if (res.ok) return res.json();
         throw res;
@@ -37,7 +38,7 @@ export default function User() {
   useEffect(() => {
     if (ID) {
       setIsEdit(true);
-      fetch(`http://localhost:3000/users/${ID}`)
+      fetch(`${api}/users/${ID}`)
         .then((res) => {
           if (res.ok) return res.json();
           throw res;
@@ -65,7 +66,7 @@ export default function User() {
   }, [userWithID]);
   const handleCreate = (e) => {
     e.preventDefault();
-    fetch("http://localhost:3000/users", {
+    fetch(`${api}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -91,7 +92,7 @@ export default function User() {
       });
   };
   const handleDelete = (id) => {
-    fetch(`http://localhost:3000/users?id=${id}`, {
+    fetch(`${api}/users?id=${id}`, {
       method: "DELETE",
     })
       .then((res) => {
@@ -115,7 +116,7 @@ export default function User() {
   };
   const handleUpdate = (e) => {
     e.preventDefault();
-    fetch(`http://localhost:3000/users?id=${ID}`, {
+    fetch(`${api}/users?id=${ID}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

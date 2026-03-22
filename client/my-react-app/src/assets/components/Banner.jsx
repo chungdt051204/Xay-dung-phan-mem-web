@@ -38,7 +38,7 @@ export default function Banner() {
 
   const goToPrevious = () => {
     setCurrentSlide((prev) =>
-      prev === 0 ? bannerSlides.length - 1 : prev - 1,
+      prev === 0 ? bannerSlides.length - 1 : prev - 1
     );
   };
 
@@ -56,7 +56,9 @@ export default function Banner() {
         {bannerSlides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`carousel-slide ${index === currentSlide ? "active" : ""}`}
+            className={`carousel-slide ${
+              index === currentSlide ? "active" : ""
+            }`}
           >
             <img src={slide.image} alt={slide.title} className="slide-image" />
             <div className="slide-content">

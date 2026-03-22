@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import "../style/ChatBot.css";
+import { api } from "../../App";
 
 const WELCOME_MSG = {
   user: false,
@@ -30,7 +31,7 @@ export default function ChatBot() {
     const currentInput = text; // Giữ lại giá trị để gửi đi
     setText("");
 
-    fetch("http://localhost:3000/api/chatbot", {
+    fetch(`${api}/api/chatbot`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: currentInput }),
