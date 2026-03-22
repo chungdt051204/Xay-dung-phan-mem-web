@@ -238,6 +238,31 @@ exports.getMe = async (req, res) => {
       .json({ message: "Lấy thông tin người dùng thất bại" });
   }
 };
+exports.putMe = async (req, res) => {
+  try {
+    const { sub } = req.payload;
+    const user = await userEntity.findOne({ _id: sub });
+    if (!user)
+      return res
+        .status(404)
+        .json({ message: "Không tìm thấy người dùng để cập nhật thông tin" });
+    const fullname = req.body.fullname || user.fullname;
+    const gender = req.body.gender || user.gender;
+    const avatar = req?.file?.path || user.avatar;
+    await userEntity.updateOne(
+      { _id: sub },
+      { fullname, gender, avatar: avatar }
+    );
+    return res
+      .status(200)
+      .json({ message: "Cập nhật thông tin người dùng thành công" });
+  } catch (error) {
+    console.log("Có lỗi xảy ra khi xử lý hàm putMe");
+    return res
+      .status(500)
+      .json({ message: "Cập nhật thông tin người dùng thất bại" });
+  }
+};
 exports.getUser = async (req, res) => {
   try {
     const arrayUser = await userEntity.find();

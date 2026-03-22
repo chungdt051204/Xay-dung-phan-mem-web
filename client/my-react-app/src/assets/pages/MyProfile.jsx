@@ -1,215 +1,177 @@
-import { useContext, useState, useRef } from "react";
-import { AppContext } from "../App.jsx"; // Điều chỉnh path nếu cần
-import "./MyProfile.css";
+import { useContext, useState, useRef, useEffect } from "react";
+import AppContext from "../components/AppContext";
+import UserNavbar from "../components/UserNavbar";
+import Footer from "../components/Footer";
+import "../style/MyProfile.css";
+import { api } from "../../App";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const GENDER_OPTIONS = ["Nam", "Nữ", "Khác"];
 
 export default function MyProfile() {
-  const { me, setMe, token } = useContext(AppContext);
-
-  const [form, setForm] = useState({
-    fullname: me?.fullname || "",
-    phone: me?.phone || "",
-    gender: me?.gender || "",
-    dateOfBirth: me?.dateOfBirth
-      ? new Date(me.dateOfBirth).toISOString().split("T")[0]
-      : "",
-  });
-  const [avatarPreview, setAvatarPreview] = useState(me?.avatar || null);
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState("");
-  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { me } = useContext(AppContext);
   const fileRef = useRef();
+
+  const [form, setForm] = useState({ fullname: "", gender: "" });
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [status, setStatus] = useState({ loading: false, msg: "", type: "" });
+
+  // Cập nhật form khi dữ liệu 'me' từ Context đã load xong
+  useEffect(() => {
+    if (me) {
+      setForm({
+        fullname: me.fullname || "",
+        gender: me.gender === "chưa chọn" ? "" : me.gender,
+      });
+      setAvatarPreview(me.avatar);
+    }
+  }, [me]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setSuccess("");
-    setError("");
+    setStatus({ ...status, msg: "" });
   };
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
-    setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
+    if (file) {
+      setAvatarFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setSuccess("");
-    setError("");
+    // setStatus({ loading: true, msg: "", type: "" });
+    console.log(form.fullname, form.gender, avatarFile);
+
     try {
       const formData = new FormData();
       formData.append("fullname", form.fullname);
-      formData.append("phone", form.phone);
       formData.append("gender", form.gender);
-      formData.append("dateOfBirth", form.dateOfBirth);
       if (avatarFile) formData.append("avatar", avatarFile);
 
-      const res = await fetch("http://localhost:3000/me", {
+      const res = await fetch(`${api}/me`, {
         method: "PUT",
-        headers: {
-          // ✅ Gửi Bearer token — KHÔNG set Content-Type khi dùng FormData
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         body: formData,
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Cập nhật thất bại");
-
-      setMe(data.data); // Cập nhật context
-      setSuccess("Cập nhật thông tin thành công!");
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Lỗi cập nhật");
+      setStatus({
+        loading: false,
+        msg: "Cập nhật thành công!",
+        type: "success",
+      });
+      toast.success(result.message);
+      navigate("/");
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      setStatus({ loading: false, msg: err.message, type: "error" });
     }
   };
 
   return (
-    <div className="profile-page">
-      <div className="profile-card">
-
-        {/* ── Left Panel ── */}
-        <div className="profile-left">
-          <div
-            className="avatar-wrapper"
-            onClick={() => fileRef.current.click()}
-          >
-            {avatarPreview ? (
-              <img src={avatarPreview} alt="avatar" />
-            ) : (
-              <div className="avatar-placeholder">
-                <span className="avatar-initial">
-                  {me?.fullname?.[0]?.toUpperCase() || "?"}
-                </span>
+    <>
+      <UserNavbar />
+      <div className="profile-page">
+        <div className="profile-card">
+          {/* Cột trái: Avatar & Thông tin cơ bản */}
+          <div className="profile-left">
+            <div
+              className="avatar-wrapper"
+              onClick={() => fileRef.current.click()}
+            >
+              <img src={avatarPreview || "/default-avatar.png"} alt="avatar" />
+              <div className="avatar-overlay">
+                <span>Đổi ảnh</span>
               </div>
+              <input
+                ref={fileRef}
+                type="file"
+                hidden
+                onChange={handleAvatarChange}
+              />
+            </div>
+            <h2 className="profile-name">{me?.fullname}</h2>
+            <div className={`role-badge ${me?.roles}`}>{me?.roles}</div>
+            <p className="join-date">
+              Gia nhập: {new Date(me?.createdAt).toLocaleDateString("vi-VN")}
+            </p>
+          </div>
+
+          {/* Cột phải: Form chỉnh sửa */}
+          <form className="profile-right" onSubmit={handleSubmit}>
+            <h1 className="form-title">Hồ sơ cá nhân</h1>
+
+            <div className="form-grid">
+              <div className="field-group">
+                <label>Họ và tên</label>
+                <input
+                  name="fullname"
+                  value={form.fullname}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="field-group">
+                <label>Giới tính</label>
+                <select
+                  name="gender"
+                  value={form.gender}
+                  onChange={handleChange}
+                >
+                  <option value="">-- Chọn --</option>
+                  {GENDER_OPTIONS.map((g) => (
+                    <option key={g} value={g}>
+                      {g}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="field-group">
+                <label>Tên đăng nhập (Không thể sửa)</label>
+                <input
+                  className="field-readonly"
+                  value={me?.username || ""}
+                  disabled
+                />
+              </div>
+
+              <div className="field-group">
+                <label>Email</label>
+                <input
+                  className="field-readonly"
+                  value={me?.email || ""}
+                  disabled
+                />
+              </div>
+
+              <div className="field-group">
+                <label>Phương thức đăng nhập</label>
+                <div className="login-tag">{me?.loginMethod}</div>
+              </div>
+            </div>
+
+            {status.msg && (
+              <div className={`msg-${status.type}`}>{status.msg}</div>
             )}
-            <div className="avatar-overlay">
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-              >
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                <circle cx="12" cy="13" r="4" />
-              </svg>
-              <span>Đổi ảnh</span>
-            </div>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={handleAvatarChange}
-            />
-          </div>
 
-          <h2 className="profile-name">{me?.fullname || "Người dùng"}</h2>
-          <p className="profile-email">{me?.email}</p>
-
-          <div className="role-badge">
-            {me?.roles === "admin" ? "👑 Admin" : "🙍 Thành viên"}
-          </div>
-
-          <div className="login-method">
-            <span className="login-dot" />
-            {me?.loginMethod || "Email thường"}
-          </div>
+            <button
+              type="submit"
+              className="btn-save"
+              disabled={status.loading}
+            >
+              {status.loading ? "Đang lưu..." : "Lưu thay đổi"}
+            </button>
+          </form>
         </div>
-
-        {/* ── Right Panel ── */}
-        <form className="profile-right" onSubmit={handleSubmit}>
-          <div className="form-header">
-            <h1 className="form-title">Thông tin cá nhân</h1>
-            <p className="form-subtitle">Cập nhật hồ sơ của bạn</p>
-          </div>
-
-          <div className="form-grid">
-            <div className="field-group">
-              <label className="field-label">Họ và tên</label>
-              <input
-                className="field-input"
-                name="fullname"
-                value={form.fullname}
-                onChange={handleChange}
-                placeholder="Nguyễn Văn A"
-              />
-            </div>
-
-            <div className="field-group">
-              <label className="field-label">Số điện thoại</label>
-              <input
-                className="field-input"
-                name="phone"
-                value={form.phone}
-                onChange={handleChange}
-                placeholder="0901234567"
-              />
-            </div>
-
-            <div className="field-group">
-              <label className="field-label">Giới tính</label>
-              <select
-                className="field-input"
-                name="gender"
-                value={form.gender}
-                onChange={handleChange}
-              >
-                <option value="">-- Chọn --</option>
-                {GENDER_OPTIONS.map((g) => (
-                  <option key={g} value={g}>
-                    {g}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="field-group">
-              <label className="field-label">Ngày sinh</label>
-              <input
-                className="field-input"
-                name="dateOfBirth"
-                type="date"
-                value={form.dateOfBirth}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          {/* Read-only */}
-          <div className="field-group">
-            <label className="field-label">Tên đăng nhập</label>
-            <input
-              className="field-input--readonly"
-              value={me?.username || ""}
-              disabled
-            />
-          </div>
-
-          <div className="field-group">
-            <label className="field-label">Email</label>
-            <input
-              className="field-input--readonly"
-              value={me?.email || ""}
-              disabled
-            />
-          </div>
-
-          {success && <div className="msg-success">✅ {success}</div>}
-          {error && <div className="msg-error">❌ {error}</div>}
-
-          <button type="submit" className="btn-save" disabled={loading}>
-            {loading ? "⏳ Đang lưu..." : "Lưu thay đổi"}
-          </button>
-        </form>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }

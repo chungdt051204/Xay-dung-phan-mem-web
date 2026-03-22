@@ -128,6 +128,7 @@ function App() {
         <Route path="/confirm" element={<Confirm />} />
         <Route path="product/detail" element={<DetailProduct />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/my-profile" element={<MyProfile />} />
         <Route path="/my-orders" element={<MyOrder />} />
         <Route path="/my-orders/detail" element={<MyOrderDetail />} />
         <Route path="/access-denied" element={<AccessDeniedPage />} />

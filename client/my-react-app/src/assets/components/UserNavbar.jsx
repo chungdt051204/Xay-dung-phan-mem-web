@@ -136,7 +136,7 @@ export default function UserNavbar() {
             {openUserMenu && (
               <ul className="user-dropdown">
                 <li>
-                  <Link to="/profile" onClick={() => setOpenUserMenu(false)}>
+                  <Link to="/my-profile" onClick={() => setOpenUserMenu(false)}>
                     <i className="fa-regular fa-user"></i> Thông tin cá nhân
                   </Link>
                 </li>
