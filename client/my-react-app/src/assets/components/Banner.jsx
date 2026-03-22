@@ -5,24 +5,38 @@ const bannerSlides = [
   {
     id: 1,
     image:
-      "https://www.shutterstock.com/image-vector/summer-collection-promotional-banner-summertime-260nw-1445935322.jpg",
+      "https://res.cloudinary.com/drbezo9mp/image/upload/v1774179846/banner2_pwquid.png",
     title: "Summer Collection",
     description: "Exclusive deals on summer products",
   },
   {
     id: 2,
     image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMaEbI4cepvUEJSCZyHw745B6zCHimjYx3yA&s",
+      "https://res.cloudinary.com/drbezo9mp/image/upload/v1774179846/banner3_kot6ec.png",
     title: "New Arrivals",
     description: "Check out our latest products",
   },
   {
     id: 3,
     image:
-      "https://img.freepik.com/premium-vector/special-offer-typography-tag-logo-banner-design-artwork_1188421-3343.jpg",
+      "https://res.cloudinary.com/drbezo9mp/image/upload/v1774179846/banner4_lxqjoh.png",
     title: "Special Offer",
     description: "Get up to 50% off on selected items",
   },
+  {
+    id: 4,
+    image:
+      "https://res.cloudinary.com/drbezo9mp/image/upload/v1774179845/banner1_ej26ga.png",
+    title: "Online Shopping",
+    description: "Shop now and enjoy fast delivery",
+  },
+  {
+  id: 5,
+  image:
+    "https://res.cloudinary.com/drbezo9mp/image/upload/v1774181305/banner5_lyjmmu.png",
+  title: "Big Sale",
+  description: "Discount up to 70% - Limited time",
+}
 ];
 
 export default function Banner() {
@@ -31,7 +45,7 @@ export default function Banner() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % bannerSlides.length);
-    }, 5000); // Change slide every 5 seconds
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
