@@ -71,6 +71,22 @@ exports.postOrder = async (req, res) => {
   try {
     const { userId, fullname, address, phone, paymentMethod, items, total } =
       req.body;
+
+    // Kiểm tra số lượng sản phẩm có sẵn
+    for (const item of items) {
+      const product = await productEntity.findById(item.productId._id);
+      if (!product) {
+        return res
+          .status(404)
+          .json({ message: `Sản phẩm ${item.productId.productName} không tồn tại` });
+      }
+      if (product.quantityStock < item.quantity) {
+        return res.status(400).json({
+          message: `Sản phẩm ${product.productName} chỉ còn ${product.quantityStock} cái. Bạn không thể đặt ${item.quantity} cái`,
+        });
+      }
+    }
+
     let arrayItems = [];
     if (items?.length > 0) {
       items.forEach((value) => {
@@ -82,6 +98,14 @@ exports.postOrder = async (req, res) => {
         });
       });
     }
+
+    // Trừ số lượng sản phẩm trong kho
+    for (const item of items) {
+      await productEntity.findByIdAndUpdate(item.productId._id, {
+        $inc: { quantityStock: -item.quantity },
+      });
+    }
+
     // Create order
     await orderEntity.create({
       userId,
@@ -92,7 +116,8 @@ exports.postOrder = async (req, res) => {
       totalAmount: total,
       items: arrayItems,
     });
-    //Xóa item đã đặt ra khỏi giỏ hàng
+
+    // Xóa item đã đặt ra khỏi giỏ hàng
     const itemIds = items?.map((value) => value._id);
     await cartEntity.updateOne(
       { userId },
@@ -109,29 +134,36 @@ exports.postOrder = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.query;
-    const { status, paymentStatus, note } = req.body;
+    const { status, paymentStatus, refundStatus, note } = req.body;
 
-    if (!status && !paymentStatus && !note) {
+    if (!status && !paymentStatus && !refundStatus && !note) {
       return res
         .status(400)
         .json({ message: "Vui lòng cung cấp thông tin cần cập nhật" });
     }
 
-    const updateData = {};
-    if (status) updateData.status = status;
-    if (paymentStatus) updateData.paymentStatus = paymentStatus;
-    if (note) updateData.note = note;
-
-    const updatedOrder = await orderEntity
-      .findByIdAndUpdate(id, updateData, { new: true })
-      .populate("userId")
-      .populate("couponId");
-
-    if (!updatedOrder) {
+    const order = await orderEntity.findById(id);
+    if (!order) {
       return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
     }
 
-    return res.status(200).json({ result: updatedOrder });
+    const updateData = {};
+    if (status) {
+      updateData.status = status;
+      // Nếu cập nhật thành "Đã hủy" và refund status chưa "Đã hoàn tiền", tự động set thành "Đang xử lý"
+      if (status === "Đã hủy" && order.refundStatus !== "Đã hoàn tiền" && !refundStatus) {
+        updateData.refundStatus = "Đang xử lý";
+        updateData.refundReason = updateData.refundReason || "Hủy đơn hàng";
+        updateData.refundDate = new Date();
+      }
+    }
+    if (paymentStatus) updateData.paymentStatus = paymentStatus;
+    if (refundStatus) updateData.refundStatus = refundStatus;
+    if (note) updateData.note = note;
+
+    const updatedOrder = await orderEntity.findByIdAndUpdate(id, updateData, { new: true });
+
+    return res.status(200).json({ result: updatedOrder, message: "Cập nhật đơn hàng thành công" });
   } catch (error) {
     console.log("Error in updateOrderStatus:", error.message);
     return res.status(500).json({ message: "Cập nhật đơn hàng thất bại" });
@@ -142,6 +174,7 @@ exports.updateOrderStatus = async (req, res) => {
 exports.cancelOrder = async (req, res) => {
   try {
     const { id } = req.query;
+    const { reason } = req.body;
 
     const order = await orderEntity.findById(id);
     if (!order) {
@@ -153,22 +186,86 @@ exports.cancelOrder = async (req, res) => {
     }
 
     // Restore product stock
-    const orderItems = await orderItemsEntity.find({ orderId: id });
-    for (const item of orderItems) {
-      await productEntity.findByIdAndUpdate(item.productId, {
-        $inc: { quantityStock: item.quantity },
-      });
+    if (order.items && order.items.length > 0) {
+      for (const item of order.items) {
+        await productEntity.findByIdAndUpdate(item.productId, {
+          $inc: { quantityStock: item.quantity },
+        });
+      }
     }
 
-    const cancelledOrder = await orderEntity
-      .findByIdAndUpdate(id, { status: "Đã hủy" }, { new: true })
-      .populate("userId")
-      .populate("couponId");
+    // Xử lý hoàn tiền
+    const refundAmount = order.totalAmount;
+    const refundDate = new Date();
 
-    return res.status(200).json({ result: cancelledOrder });
+    const cancelledOrder = await orderEntity.findByIdAndUpdate(
+      id,
+      {
+        status: "Đã hủy",
+        refundStatus: "Đang xử lý",
+        refundAmount: refundAmount,
+        refundReason: reason || "Khách hàng yêu cầu hủy",
+        refundDate: refundDate,
+      },
+      { new: true }
+    );
+
+    // Log hoàn tiền
+    console.log(
+      `Hoàn tiền ${refundAmount} VNĐ cho đơn hàng ${id}. Lý do: ${reason || "Khách hàng yêu cầu hủy"}`
+    );
+
+    return res.status(200).json({
+      result: cancelledOrder,
+      message:
+        "Đơn hàng đã bị hủy. Tiền sẽ được hoàn lại trong 3-5 ngày làm việc",
+    });
   } catch (error) {
     console.log("Error in cancelOrder:", error.message);
     return res.status(500).json({ message: "Hủy đơn hàng thất bại" });
+  }
+};
+
+// Process refund - Admin endpoint to confirm refund
+exports.processRefund = async (req, res) => {
+  try {
+    const { id } = req.query;
+
+    const order = await orderEntity.findById(id);
+    if (!order) {
+      return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+    }
+
+    if (order.status !== "Đã hủy") {
+      return res
+        .status(400)
+        .json({ message: "Chỉ có thể hoàn tiền cho đơn hàng đã hủy" });
+    }
+
+    if (order.refundStatus === "Đã hoàn tiền") {
+      return res.status(400).json({ message: "Đơn hàng này đã hoàn tiền rồi" });
+    }
+
+    const refundedOrder = await orderEntity.findByIdAndUpdate(
+      id,
+      {
+        refundStatus: "Đã hoàn tiền",
+        refundDate: new Date(),
+      },
+      { new: true }
+    );
+
+    console.log(
+      `Hoàn tiền ${refundedOrder.refundAmount} VNĐ cho đơn hàng ${id} hoàn tất`
+    );
+
+    return res.status(200).json({
+      result: refundedOrder,
+      message: `Hoàn tiền ${refundedOrder.refundAmount} VNĐ thành công`,
+    });
+  } catch (error) {
+    console.log("Error in processRefund:", error.message);
+    return res.status(500).json({ message: "Xử lý hoàn tiền thất bại" });
   }
 };
 
