@@ -64,7 +64,7 @@ export default function OrderManager() {
     // Filter by payment status
     if (paymentFilter !== "Tất cả") {
       filtered = filtered.filter(
-        (order) => order.paymentStatus === paymentFilter,
+        (order) => order.paymentStatus === paymentFilter
       );
     }
 
@@ -73,7 +73,7 @@ export default function OrderManager() {
       filtered = filtered.filter(
         (order) =>
           order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          order.fullname.toLowerCase().includes(searchTerm.toLowerCase()),
+          order.fullname.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -181,7 +181,7 @@ export default function OrderManager() {
       {!isLoading && (
         <div className="order-manager">
           {/* Statistics Section */}
-          <div className="stats-section">
+          {/* <div className="stats-section">
             <div className="stat-card">
               <div className="stat-value">{stats.total}</div>
               <div className="stat-label">Tổng đơn hàng</div>
@@ -208,7 +208,7 @@ export default function OrderManager() {
               </div>
               <div className="stat-label">Doanh thu</div>
             </div>
-          </div>
+          </div> */}
 
           {/* Controls Section */}
           <div className="order-controls">
@@ -284,12 +284,12 @@ export default function OrderManager() {
                             order.status === "Chờ xác nhận"
                               ? "badge-pending"
                               : order.status === "Đã xác nhận"
-                                ? "badge-confirmed"
-                                : order.status === "Đang giao"
-                                  ? "badge-shipped"
-                                  : order.status === "Đã giao"
-                                    ? "badge-delivered"
-                                    : "badge-cancelled"
+                              ? "badge-confirmed"
+                              : order.status === "Đang giao"
+                              ? "badge-shipped"
+                              : order.status === "Đã giao"
+                              ? "badge-delivered"
+                              : "badge-cancelled"
                           }`}
                         >
                           {order.status}
@@ -312,8 +312,8 @@ export default function OrderManager() {
                             order.refundStatus === "Chưa hoàn tiền"
                               ? "badge-unpaid"
                               : order.refundStatus === "Đang xử lý"
-                                ? "badge-pending"
-                                : "badge-paid"
+                              ? "badge-pending"
+                              : "badge-paid"
                           }`}
                         >
                           {order.refundStatus || "Chưa hoàn tiền"}
@@ -330,7 +330,7 @@ export default function OrderManager() {
                             setNewStatus(order.status);
                             setNewPaymentStatus(order.paymentStatus);
                             setNewRefundStatus(
-                              order.refundStatus || "Chưa hoàn tiền",
+                              order.refundStatus || "Chưa hoàn tiền"
                             );
                             setShowModal(true);
                           }}

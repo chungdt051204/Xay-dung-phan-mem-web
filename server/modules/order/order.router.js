@@ -1,6 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const orderController = require("./order.controller");
+const {
+  verifyToken,
+  verifyAdmin,
+} = require("../../service/middleware/authMiddleware");
+const prefix = "";
 
 // Order routes - More specific routes FIRST
 router.get("/order/id", orderController.getOrderById);
@@ -10,7 +15,8 @@ router.put("/order/refund", orderController.processRefund);
 
 // General routes
 router.get("/order", orderController.getOrder);
-router.post("/order", orderController.postOrder);
+router.post("/order", verifyToken, orderController.postOrder);
+router.get(`${prefix}/momo-callback`, orderController.getMomoCallback);
 router.put("/order", orderController.updateOrderStatus);
 router.delete("/order", orderController.deleteOrder);
 

@@ -1,6 +1,8 @@
 const orderEntity = require("../../model/order.model");
 const productEntity = require("../../model/product.model");
 const cartEntity = require("../../model/cart.model");
+const crypto = require("crypto");
+const axios = require("axios");
 
 // Get all orders with pagination
 exports.getOrder = async (req, res) => {
@@ -69,16 +71,20 @@ exports.getOrderById = async (req, res) => {
 // Create new order
 exports.postOrder = async (req, res) => {
   try {
-    const { userId, fullname, address, phone, paymentMethod, items, total } =
-      req.body;
+    if (!req.payload)
+      return res
+        .status(404)
+        .json({ message: "Không tìm thấy người dùng để xử lý đơn hàng" });
+    const userId = req.payload.sub;
+    const { fullname, address, phone, paymentMethod, items, total } = req.body;
 
     // Kiểm tra số lượng sản phẩm có sẵn
     for (const item of items) {
       const product = await productEntity.findById(item.productId._id);
       if (!product) {
-        return res
-          .status(404)
-          .json({ message: `Sản phẩm ${item.productId.productName} không tồn tại` });
+        return res.status(404).json({
+          message: `Sản phẩm ${item.productId.productName} không tồn tại`,
+        });
       }
       if (product.quantityStock < item.quantity) {
         return res.status(400).json({
@@ -86,7 +92,6 @@ exports.postOrder = async (req, res) => {
         });
       }
     }
-
     let arrayItems = [];
     if (items?.length > 0) {
       items.forEach((value) => {
@@ -99,15 +104,8 @@ exports.postOrder = async (req, res) => {
       });
     }
 
-    // Trừ số lượng sản phẩm trong kho
-    for (const item of items) {
-      await productEntity.findByIdAndUpdate(item.productId._id, {
-        $inc: { quantityStock: -item.quantity },
-      });
-    }
-
     // Create order
-    await orderEntity.create({
+    const newOrder = await orderEntity.create({
       userId,
       fullname,
       address,
@@ -116,17 +114,117 @@ exports.postOrder = async (req, res) => {
       totalAmount: total,
       items: arrayItems,
     });
-
-    // Xóa item đã đặt ra khỏi giỏ hàng
+    //Xóa các item được chọn ra khỏi giỏ hàng
     const itemIds = items?.map((value) => value._id);
     await cartEntity.updateOne(
       { userId },
       { $pull: { items: { _id: { $in: itemIds } } } }
     );
-    return res.status(200).json({ message: "Đặt hàng thành công" });
+    if (paymentMethod === "cod") {
+      // Trừ số lượng sản phẩm trong kho
+      for (const item of items) {
+        await productEntity.findByIdAndUpdate(item.productId._id, {
+          $inc: { quantityStock: -item.quantity },
+        });
+      }
+      return res.status(200).json({ message: "Đặt hàng thành công" });
+    }
+    if (paymentMethod === "online") {
+      var partnerCode = "MOMO";
+      var accessKey = "F8BBA842ECF85";
+      var secretkey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
+      var requestId = partnerCode + new Date().getTime();
+      var orderId = newOrder?._id;
+      var orderInfo = `Thanh toán cho đơn hàng + ${newOrder?._id}`;
+      var redirectUrl = "http://localhost:3000/momo-callback";
+      var ipnUrl = "https://callback.url/notify";
+      // var ipnUrl = redirectUrl = "https://webhook.site/454e7b77-f177-4ece-8236-ddf1c26ba7f8";
+      var amount = total;
+      var requestType = "payWithMethod";
+      var extraData = ""; //pass empty value if your merchant does not have stores
+
+      //before sign HMAC SHA256 with format
+      //accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType
+      var rawSignature =
+        "accessKey=" +
+        accessKey +
+        "&amount=" +
+        amount +
+        "&extraData=" +
+        extraData +
+        "&ipnUrl=" +
+        ipnUrl +
+        "&orderId=" +
+        orderId +
+        "&orderInfo=" +
+        orderInfo +
+        "&partnerCode=" +
+        partnerCode +
+        "&redirectUrl=" +
+        redirectUrl +
+        "&requestId=" +
+        requestId +
+        "&requestType=" +
+        requestType;
+
+      var signature = crypto
+        .createHmac("sha256", secretkey)
+        .update(rawSignature)
+        .digest("hex");
+
+      //json object send to MoMo endpoint
+      const requestBody = JSON.stringify({
+        partnerCode: partnerCode,
+        accessKey: accessKey,
+        requestId: requestId,
+        amount: amount,
+        orderId: orderId,
+        orderInfo: orderInfo,
+        redirectUrl: redirectUrl,
+        ipnUrl: ipnUrl,
+        extraData: extraData,
+        requestType: requestType,
+        signature: signature,
+        lang: "en",
+      });
+      const response = await axios.post(
+        "https://test-payment.momo.vn/v2/gateway/api/create",
+        requestBody,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return res.status(200).json({ url: response.data.payUrl });
+    }
+
+    // Xóa item đã đặt ra khỏi giỏ hàng
   } catch (error) {
     console.log("Có lỗi xảy ra khi xử lý hàm postOrder", error.message);
-    return res.status(500).json({ message: "Tạo đơn hàng thất bại" });
+    return res
+      .status(500)
+      .json({ message: "Tạo đơn hàng thất bại", error: error.message });
+  }
+};
+exports.getMomoCallback = async (req, res) => {
+  try {
+    console.log(req.query);
+    const { orderId, resultCode, message } = req.query;
+    if (resultCode == 0) {
+      const order = orderEntity.findOne({ _id: orderId });
+      if (!order) return res.status(404).json("Không tìm thấy đơn hàng");
+      await orderEntity.updateOne(
+        { _id: orderId },
+        { paymentStatus: "Đã thanh toán" }
+      );
+      return res.redirect(`http://localhost:5173/cart?message=${message}`);
+    }
+    return res.status(400).json("Lỗi thanh toán");
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Lỗi hệ thống", error: error.message });
   }
 };
 
@@ -151,7 +249,11 @@ exports.updateOrderStatus = async (req, res) => {
     if (status) {
       updateData.status = status;
       // Nếu cập nhật thành "Đã hủy" và refund status chưa "Đã hoàn tiền", tự động set thành "Đang xử lý"
-      if (status === "Đã hủy" && order.refundStatus !== "Đã hoàn tiền" && !refundStatus) {
+      if (
+        status === "Đã hủy" &&
+        order.refundStatus !== "Đã hoàn tiền" &&
+        !refundStatus
+      ) {
         updateData.refundStatus = "Đang xử lý";
         updateData.refundReason = updateData.refundReason || "Hủy đơn hàng";
         updateData.refundDate = new Date();
@@ -161,9 +263,13 @@ exports.updateOrderStatus = async (req, res) => {
     if (refundStatus) updateData.refundStatus = refundStatus;
     if (note) updateData.note = note;
 
-    const updatedOrder = await orderEntity.findByIdAndUpdate(id, updateData, { new: true });
+    const updatedOrder = await orderEntity.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
 
-    return res.status(200).json({ result: updatedOrder, message: "Cập nhật đơn hàng thành công" });
+    return res
+      .status(200)
+      .json({ result: updatedOrder, message: "Cập nhật đơn hàng thành công" });
   } catch (error) {
     console.log("Error in updateOrderStatus:", error.message);
     return res.status(500).json({ message: "Cập nhật đơn hàng thất bại" });
@@ -212,7 +318,9 @@ exports.cancelOrder = async (req, res) => {
 
     // Log hoàn tiền
     console.log(
-      `Hoàn tiền ${refundAmount} VNĐ cho đơn hàng ${id}. Lý do: ${reason || "Khách hàng yêu cầu hủy"}`
+      `Hoàn tiền ${refundAmount} VNĐ cho đơn hàng ${id}. Lý do: ${
+        reason || "Khách hàng yêu cầu hủy"
+      }`
     );
 
     return res.status(200).json({

@@ -184,9 +184,9 @@ export default function Cart() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
-        userId: me?._id,
         fullname: fullname,
         address: address,
         phone: phone,
@@ -199,14 +199,24 @@ export default function Cart() {
         if (res.ok) return res.json();
         throw res;
       })
-      .then(({ message }) => {
-        toast.success(message);
-        formDialog.current.close();
-        setRefresh((prev) => prev + 1);
+      .then(({ message, url }) => {
+        if (paymentMethod === "cod") {
+          toast.success(message);
+          formDialog.current.close();
+          setRefresh((prev) => prev + 1);
+        }
+        if (paymentMethod === "online") {
+          console.log(url);
+          window.location.href = url;
+        }
       })
       .catch(async (err) => {
-        const { message } = await err.json();
-        console.log(message);
+        formDialog.current.close();
+        if (err.status === 404 || err.status === 400) {
+          const { message } = await err.json();
+          toast.error(message);
+        }
+        console.log("Lỗi hệ thống");
       });
   };
   return (

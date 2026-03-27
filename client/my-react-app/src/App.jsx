@@ -150,7 +150,11 @@ function App() {
           <Route path="orders" element={<OrderManager />} />
         </Route>
       </Routes>
-      <ToastContainer position="top-center" autoClose={1000} />
+      <ToastContainer
+        position="top-center"
+        autoClose={1000}
+        style={{ zIndex: 9999 }}
+      />
     </AppContext.Provider>
   );
 }
