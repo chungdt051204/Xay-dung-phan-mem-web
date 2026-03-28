@@ -9,13 +9,14 @@ import "../style/UserManager.css";
 import Pagination from "../components/PaginationButton";
 
 export default function UserManager() {
-  const { refresh, setRefresh, users, setUsers } = useContext(AppContext);
+  const { refresh, setRefresh } = useContext(AppContext);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const params = new URLSearchParams(searchParams);
   const page = searchParams.get("page");
   const role = searchParams.get("role");
   const id = searchParams.get("id");
+  const [users, setUsers] = useState([]);
   const [userWithId, setUserWithId] = useState("");
   const [formUser, setFormUser] = useState({
     fullname: "",

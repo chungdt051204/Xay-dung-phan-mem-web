@@ -8,10 +8,6 @@ const {
 const prefix = "";
 
 // Order routes - More specific routes FIRST
-router.get("/order/id", orderController.getOrderById);
-router.get("/order/stats", orderController.getOrderStats);
-router.post("/order/cancel", orderController.cancelOrder);
-router.put("/order/refund", orderController.processRefund);
 
 // General routes
 router.get("/order", orderController.getOrder);

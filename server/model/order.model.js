@@ -8,11 +8,6 @@ const orderItemsSchema = new mongoose.Schema(
       required: true,
     },
 
-    // productName: {
-    //   type: String,
-    //   required: true,
-    // },
-
     quantity: {
       type: Number,
       min: 1,
@@ -92,28 +87,6 @@ const orderSchema = new mongoose.Schema(
     note: {
       type: String,
       default: "",
-    },
-
-    refundStatus: {
-      type: String,
-      enum: ["Chưa hoàn tiền", "Đang xử lý", "Đã hoàn tiền"],
-      default: "Chưa hoàn tiền",
-    },
-
-    refundAmount: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
-
-    refundReason: {
-      type: String,
-      default: "",
-    },
-
-    refundDate: {
-      type: Date,
-      default: null,
     },
 
     items: [orderItemsSchema],
