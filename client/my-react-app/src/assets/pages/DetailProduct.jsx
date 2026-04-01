@@ -25,33 +25,40 @@ export default function DetailProduct() {
     });
   }, [productId]);
   const handleAddCart = () => {
-    if (!isLogin) toast.warning("Bạn chưa đăng nhập !!");
-    else {
-      fetch(`${api}/cart`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: me?._id,
-          productId: data?._id,
-          quantity: quantity,
-        }),
-      })
-        .then((res) => {
-          if (res.ok) return res.json();
-          throw res;
-        })
-        .then(({ message }) => {
-          toast.success(message);
-          setRefresh((prev) => prev + 1);
-        })
-        .catch(async (err) => {
-          const { message } = await err.json();
-          console.log(message);
-        });
+    if (!isLogin) {
+      toast.warning("Bạn chưa đăng nhập !!");
+      return;
     }
+
+    if (quantity > data.quantityStock) {
+      toast.warning(`Sản phẩm chỉ còn ${data.quantityStock} cái`);
+      return;
+    }
+
+    fetch(`${api}/cart`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: me?._id,
+        productId: data?._id,
+        quantity: quantity,
+      }),
+    })
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw res;
+      })
+      .then(({ message }) => {
+        toast.success(message);
+        setRefresh((prev) => prev + 1);
+      })
+      .catch(async (err) => {
+        const { message } = await err.json();
+        console.log(message);
+      });
   };
 
   if (!data) {
@@ -99,13 +106,36 @@ export default function DetailProduct() {
                 -
               </button>
               <span>{quantity}</span>
-              <button onClick={() => setQuantity(quantity + 1)}>+</button>
+              <button
+                onClick={() =>
+                  quantity < data.quantityStock && setQuantity(quantity + 1)
+                }
+                disabled={quantity >= data.quantityStock}
+              >
+                +
+              </button>
             </div>
 
             <div className="button-group">
-              <button onClick={handleAddCart} className="btn-cart">
-                Thêm vào giỏ
-              </button>
+              {data.quantityStock <= 0 ? (
+                <button
+                  className="btn-cart"
+                  disabled
+                  style={{ opacity: 0.5, cursor: "not-allowed" }}
+                >
+                  Hết hàng
+                </button>
+              ) : (
+                <button
+                  onClick={handleAddCart}
+                  className="btn-cart"
+                  disabled={quantity > data.quantityStock}
+                >
+                  {quantity > data.quantityStock
+                    ? "Vượt quá số lượng tồn kho"
+                    : "Thêm vào giỏ"}
+                </button>
+              )}
             </div>
           </div>
         </div>

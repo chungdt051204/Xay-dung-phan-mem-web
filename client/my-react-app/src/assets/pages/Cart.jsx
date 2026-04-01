@@ -62,7 +62,8 @@ export default function Cart() {
 
   useEffect(() => {
     setSelectedItems(
-      myCart?.items.filter((value) => itemIdsSelected.includes(value._id)) || []
+      myCart?.items.filter((value) => itemIdsSelected.includes(value._id)) ||
+        [],
     );
   }, [itemIdsSelected, myCart]);
 
@@ -106,6 +107,14 @@ export default function Cart() {
     }
   };
   const handleIncreaseQuantity = (item) => {
+    // Kiểm tra số lượng tồn kho
+    if (item.quantity >= item.productId.quantityStock) {
+      toast.warning(
+        `Sản phẩm "${item.productId.productName}" chỉ còn ${item.productId.quantityStock} cái`,
+      );
+      return;
+    }
+
     fetch(`${api}/cart?userId=${me?._id}&action=increase`, {
       method: "PUT",
       headers: {
@@ -262,6 +271,15 @@ export default function Cart() {
                       <button onClick={() => handleIncreaseQuantity(item)}>
                         +
                       </button>
+                      <span
+                        style={{
+                          marginLeft: "10px",
+                          fontSize: "12px",
+                          color: "#888",
+                        }}
+                      >
+                        (Còn: {item.productId.quantityStock})
+                      </span>
                     </div>
                   </div>
                   <button

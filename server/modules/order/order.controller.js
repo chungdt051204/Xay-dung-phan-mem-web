@@ -53,17 +53,24 @@ exports.postOrder = async (req, res) => {
     const userId = req.payload.sub;
     const { fullname, address, phone, paymentMethod, items, total } = req.body;
 
-    // Check kho và chuẩn bị mảng items
-    let arrayItems = [];
+    // Kiểm tra số lượng sản phẩm có sẵn
     for (const item of items) {
       const product = await productEntity.findById(item.productId._id);
-      if (!product || product.quantityStock < item.quantity) {
-        return res.status(400).json({
-          message: `Sản phẩm ${
-            product?.productName || "không tồn tại"
-          } không đủ hàng`,
+      if (!product) {
+        return res.status(404).json({
+          message: `Sản phẩm không tồn tại`,
         });
       }
+      if (product.quantityStock < item.quantity) {
+        return res.status(400).json({
+          message: `Sản phẩm "${product.productName}" chỉ còn ${product.quantityStock} cái. Bạn không thể đặt ${item.quantity} cái`,
+        });
+      }
+    }
+
+    // Chuẩn bị mảng items
+    let arrayItems = [];
+    for (const item of items) {
       arrayItems.push({
         productId: item.productId._id,
         quantity: item.quantity,
@@ -92,11 +99,6 @@ exports.postOrder = async (req, res) => {
 
     // Xử lý theo phương thức thanh toán
     if (paymentMethod === "cod") {
-      for (const item of items) {
-        await productEntity.findByIdAndUpdate(item.productId._id, {
-          $inc: { quantityStock: -item.quantity },
-        });
-      }
       return res.status(200).json({ message: "Đặt hàng thành công" });
     }
 
@@ -265,13 +267,6 @@ exports.cancelOrder = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Không thể hủy đơn hàng ở trạng thái này" });
-    }
-
-    // Hoàn lại số lượng vào kho
-    for (const item of order.items) {
-      await productEntity.findByIdAndUpdate(item.productId, {
-        $inc: { quantityStock: item.quantity },
-      });
     }
 
     await orderEntity.findByIdAndUpdate(id, { status: "Đã hủy" });

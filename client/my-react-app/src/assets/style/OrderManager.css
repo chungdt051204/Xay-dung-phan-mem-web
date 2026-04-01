@@ -211,7 +211,6 @@
 
 /* Buttons */
 .btn-edit,
-.btn-refund,
 .btn-detail {
     font-size: 10px;
     padding: 5px 10px;
@@ -235,17 +234,6 @@
 
 .btn-edit:hover {
     background: #3498db;
-    color: #fff;
-}
-
-.btn-refund {
-    border-color: #27ae60;
-    background: #d4edda;
-    color: #27ae60;
-}
-
-.btn-refund:hover {
-    background: #27ae60;
     color: #fff;
 }
 

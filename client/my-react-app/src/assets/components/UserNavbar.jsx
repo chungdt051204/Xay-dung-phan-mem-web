@@ -7,16 +7,24 @@ import { toast } from "react-toastify";
 
 export default function UserNavbar() {
   const navigate = useNavigate();
-  const { isLogin, setIsLogin, setRefresh, me } = useContext(AppContext);
+  const { isLogin, setIsLogin, setRefresh, me, products } =
+    useContext(AppContext);
   const [openUserMenu, setOpenUserMenu] = useState(false);
   const [openCategoryMenu, setOpenCategoryMenu] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const userMenuRef = useRef(null);
+  const searchRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
         setOpenUserMenu(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSuggestions(false);
       }
     };
 
@@ -25,6 +33,42 @@ export default function UserNavbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchInput.trim()) {
+      navigate(`/?search=${encodeURIComponent(searchInput.trim())}`);
+      setSearchInput("");
+      setShowSuggestions(false);
+      setSuggestions([]);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchInput(value);
+
+    if (value.trim().length > 0 && products?.docs) {
+      const filtered = products.docs.filter(
+        (product) =>
+          product.productName.toLowerCase().includes(value.toLowerCase()) ||
+          (product.description &&
+            product.description.toLowerCase().includes(value.toLowerCase())),
+      );
+      setSuggestions(filtered?.slice(0, 8) || []);
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (productId, productName) => {
+    navigate(`/product/${productId}`);
+    setSearchInput("");
+    setShowSuggestions(false);
+    setSuggestions([]);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -97,13 +141,49 @@ export default function UserNavbar() {
         </div>
       </div>
 
-      <div className="navbar-search">
-        <i className="fa-solid fa-magnifying-glass"></i>
-        <input
-          className="search"
-          type="text"
-          placeholder="Bạn muốn mua gì hôm nay?"
-        />
+      <div className="navbar-search" ref={searchRef}>
+        <form onSubmit={handleSearch}>
+          <i className="fa-solid fa-magnifying-glass"></i>
+          <input
+            className="search"
+            type="text"
+            placeholder="Bạn muốn mua gì hôm nay?"
+            value={searchInput}
+            onChange={handleInputChange}
+          />
+        </form>
+
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="search-suggestions">
+            <ul className="suggestions-list">
+              {suggestions.map((product) => (
+                <li key={product._id}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleSuggestionClick(product._id, product.productName)
+                    }
+                    className="suggestion-item"
+                  >
+                    <img
+                      src={product.image}
+                      alt={product.productName}
+                      className="suggestion-image"
+                    />
+                    <div className="suggestion-content">
+                      <span className="suggestion-name">
+                        {product.productName}
+                      </span>
+                      <span className="suggestion-price">
+                        {product.price?.toLocaleString("vi-VN")} đ
+                      </span>
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       <div className="navbar-right">
