@@ -15,6 +15,7 @@ router.post("/order", verifyToken, orderController.postOrder);
 router.get(`${prefix}/momo-callback`, orderController.getMomoCallback);
 router.put("/order", orderController.updateOrderStatus);
 router.delete("/order", orderController.deleteOrder);
+router.put("/order/cancel", orderController.cancelOrder);
 
 // User specific routes
 router.get("/user/orders", orderController.getUserOrders);

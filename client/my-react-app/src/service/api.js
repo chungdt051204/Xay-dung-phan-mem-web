@@ -11,8 +11,16 @@ const fetchApi = ({ url, setData }) => {
       setData(result);
     })
     .catch(async (err) => {
-      const { message } = await err.json();
-      console.log(message);
+      try {
+        if (err instanceof Response) {
+          const { message } = await err.json();
+          console.log(message);
+        } else {
+          console.log("Network or other error:", err.message || err);
+        }
+      } catch (parseError) {
+        console.log("Error parsing response:", parseError);
+      }
     });
 };
 export default fetchApi;

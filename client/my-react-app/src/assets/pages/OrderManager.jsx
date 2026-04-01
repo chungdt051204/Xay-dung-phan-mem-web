@@ -13,6 +13,8 @@ export default function OrderManager() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("Tất cả");
   const [paymentFilter, setPaymentFilter] = useState("Tất cả");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   const statuses = [
     "Tất cả",
@@ -35,14 +37,20 @@ export default function OrderManager() {
   }, [isLoading, me, navigate]);
 
   // 2. Lấy danh sách đơn hàng
-  const fetchOrders = () => {
+  const fetchOrders = (page = 1) => {
     if (me?.roles === "admin") {
-      fetchApi({ url: `${api}/order`, setData: setAllOrders });
+      fetchApi({
+        url: `${api}/order?_page=${page}&_limit=${itemsPerPage}`,
+        setData: setAllOrders,
+      });
+      setCurrentPage(page);
     }
   };
 
   useEffect(() => {
-    fetchOrders();
+    if (me?.roles === "admin") {
+      fetchOrders(1);
+    }
   }, [me]);
 
   // 3. Bộ lọc và Tìm kiếm
@@ -56,7 +64,7 @@ export default function OrderManager() {
       filtered = filtered.filter(
         (o) =>
           o._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          o.fullname.toLowerCase().includes(searchTerm.toLowerCase())
+          o.fullname.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
     setFilteredOrders(filtered);
@@ -111,7 +119,7 @@ export default function OrderManager() {
       )}
       {!isLoading && (
         <div className="order-manager">
-          {/* Controls Section - Giữ nguyên */}
+          {/* Controls Section */}
           <div className="order-controls">
             <div className="search-box">
               <input
@@ -148,7 +156,7 @@ export default function OrderManager() {
             </div>
           </div>
 
-          {/* Orders Table - Giữ nguyên cấu trúc */}
+          {/* Orders Table */}
           <div className="order-table-wrapper">
             <table className="order-table">
               <thead>
@@ -183,12 +191,12 @@ export default function OrderManager() {
                             order.status === "Chờ xác nhận"
                               ? "badge-pending"
                               : order.status === "Đã xác nhận"
-                              ? "badge-confirmed"
-                              : order.status === "Đang giao"
-                              ? "badge-shipped"
-                              : order.status === "Đã giao"
-                              ? "badge-delivered"
-                              : "badge-cancelled"
+                                ? "badge-confirmed"
+                                : order.status === "Đang giao"
+                                  ? "badge-shipped"
+                                  : order.status === "Đã giao"
+                                    ? "badge-delivered"
+                                    : "badge-cancelled"
                           }`}
                         >
                           {order.status}
@@ -209,7 +217,6 @@ export default function OrderManager() {
                         {new Date(order.createdAt).toLocaleDateString("vi-VN")}
                       </td>
                       <td>
-                        {/* Thay thế nút Sửa cũ bằng Nút tiến trình mới */}
                         {order.status === "Chờ xác nhận" && (
                           <button
                             className="btn-edit"
@@ -260,6 +267,28 @@ export default function OrderManager() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="pagination-container">
+            <button
+              className="pagination-btn"
+              onClick={() => fetchOrders(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              ← Trang trước
+            </button>
+            <span className="pagination-info">
+              Trang {currentPage} / {allOrders?.totalPages || 1} | Tổng:{" "}
+              {allOrders?.totalDocs || 0} đơn hàng
+            </span>
+            <button
+              className="pagination-btn"
+              onClick={() => fetchOrders(currentPage + 1)}
+              disabled={currentPage >= (allOrders?.totalPages || 1)}
+            >
+              Trang sau →
+            </button>
           </div>
         </div>
       )}
