@@ -3,6 +3,7 @@
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
+    margin-top: 64px;
     overflow: hidden;
     border-radius: 10px;
     background: #0b1d3a;
@@ -41,7 +42,7 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(0,0,0,0.4);
+    background: rgba(0, 0, 0, 0.4);
     color: #fff;
     border: none;
     font-size: 24px;
@@ -51,11 +52,16 @@
     border-radius: 6px;
 }
 
-.prev-btn { left: 15px; }
-.next-btn { right: 15px; }
+.prev-btn {
+    left: 15px;
+}
+
+.next-btn {
+    right: 15px;
+}
 
 .carousel-btn:hover {
-    background: rgba(0,0,0,0.7);
+    background: rgba(0, 0, 0, 0.7);
 }
 
 .carousel-dots {
@@ -72,7 +78,7 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.5);
+    background: rgba(255, 255, 255, 0.5);
     border: none;
     cursor: pointer;
     transition: 0.3s;
