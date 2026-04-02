@@ -25,8 +25,7 @@ import Contact from "./assets/pages/Contact";
 import FAQ from "./assets/pages/FAQ";
 import Account from "./assets/pages/Account";
 import Checkout from "./assets/pages/Checkout";
-import Wishlist from "./assets/pages/Wishlist";
-import Orders from "./assets/pages/Orders";
+
 import User from "./assets/pages/User";
 import ChatBot from "./assets/components/ChatBot";
 import MyProfile from "./assets/pages/MyProfile";
@@ -146,8 +145,7 @@ function App() {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/account" element={<Account />} />
         <Route path="/checkout" element={<Checkout />} />
-        <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/orders" element={<Orders />} />
+
         {/* Routes cho phía Admin  */}
         <Route path="/admin" element={<HomeAdmin />}>
           <Route path="" element={<Dashboard />} />

@@ -109,7 +109,7 @@ exports.postOrder = async (req, res) => {
         secretkey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
       const requestId = partnerCode + new Date().getTime();
       const orderInfo = `Thanh toán đơn hàng ${newOrder._id}`;
-      const redirectUrl = "http://localhost:3000/momo-callback",
+      const redirectUrl = `${process.env.URL_BACKEND}/momo-callback`,
         ipnUrl = "https://callback.url/notify";
 
       const rawSignature = `accessKey=${accessKey}&amount=${total}&extraData=&ipnUrl=${ipnUrl}&orderId=${newOrder._id}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=payWithMethod`;
@@ -186,7 +186,9 @@ exports.getMomoCallback = async (req, res) => {
         })
       );
 
-      return res.redirect(`http://localhost:5173/cart?message=${message}`);
+      return res.redirect(
+        `${process.env.URL_FRONTEND}/cart?message=${message}`
+      );
     }
     return res
       .status(400)

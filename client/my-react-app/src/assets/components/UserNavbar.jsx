@@ -64,7 +64,7 @@ export default function UserNavbar() {
   };
 
   const handleSuggestionClick = (productId, productName) => {
-    navigate(`/product/${productId}`);
+    navigate(`/product/detail?productId=${productId}`);
     setSearchInput("");
     setShowSuggestions(false);
     setSuggestions([]);

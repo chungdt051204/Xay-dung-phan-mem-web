@@ -1,20 +1,21 @@
 import { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import AppContext from "../components/AppContext";
 import fetchApi from "../../service/api";
 import { api } from "../../App";
 import "../style/OrderManager.css";
+import Pagination from "../components/PaginationButton";
 
 export default function OrderManager() {
-  const { me, isLoading } = useContext(AppContext);
+  const { isLoading, refresh, setRefresh } = useContext(AppContext);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = searchParams.get("page");
   const [allOrders, setAllOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("Tất cả");
   const [paymentFilter, setPaymentFilter] = useState("Tất cả");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
 
   const statuses = [
     "Tất cả",
@@ -26,32 +27,14 @@ export default function OrderManager() {
   ];
   const paymentStatuses = ["Tất cả", "Đã thanh toán", "Chưa thanh toán"];
 
-  // 1. Kiểm tra quyền Admin
   useEffect(() => {
-    if (!isLoading) {
-      if (!me || me?.roles !== "admin") {
-        navigate("/");
-        return;
-      }
-    }
-  }, [isLoading, me, navigate]);
-
-  // 2. Lấy danh sách đơn hàng
-  const fetchOrders = (page = 1) => {
-    if (me?.roles === "admin") {
-      fetchApi({
-        url: `${api}/order?_page=${page}&_limit=${itemsPerPage}`,
-        setData: setAllOrders,
-      });
-      setCurrentPage(page);
-    }
-  };
-
-  useEffect(() => {
-    if (me?.roles === "admin") {
-      fetchOrders(1);
-    }
-  }, [me]);
+    const params = new URLSearchParams();
+    if (page) params.append("_page", page);
+    fetchApi({
+      url: `${api}/order?${params.toString()}&_limit=10`,
+      setData: setAllOrders,
+    });
+  }, [page, refresh]);
 
   // 3. Bộ lọc và Tìm kiếm
   useEffect(() => {
@@ -64,7 +47,7 @@ export default function OrderManager() {
       filtered = filtered.filter(
         (o) =>
           o._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          o.fullname.toLowerCase().includes(searchTerm.toLowerCase()),
+          o.fullname.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     setFilteredOrders(filtered);
@@ -101,7 +84,7 @@ export default function OrderManager() {
       });
 
       if (response.ok) {
-        fetchOrders();
+        setRefresh((prev) => prev + 1);
       } else {
         alert("Cập nhật thất bại");
       }
@@ -191,12 +174,12 @@ export default function OrderManager() {
                             order.status === "Chờ xác nhận"
                               ? "badge-pending"
                               : order.status === "Đã xác nhận"
-                                ? "badge-confirmed"
-                                : order.status === "Đang giao"
-                                  ? "badge-shipped"
-                                  : order.status === "Đã giao"
-                                    ? "badge-delivered"
-                                    : "badge-cancelled"
+                              ? "badge-confirmed"
+                              : order.status === "Đang giao"
+                              ? "badge-shipped"
+                              : order.status === "Đã giao"
+                              ? "badge-delivered"
+                              : "badge-cancelled"
                           }`}
                         >
                           {order.status}
@@ -267,28 +250,7 @@ export default function OrderManager() {
                 )}
               </tbody>
             </table>
-          </div>
-
-          {/* Pagination Controls */}
-          <div className="pagination-container">
-            <button
-              className="pagination-btn"
-              onClick={() => fetchOrders(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              ← Trang trước
-            </button>
-            <span className="pagination-info">
-              Trang {currentPage} / {allOrders?.totalPages || 1} | Tổng:{" "}
-              {allOrders?.totalDocs || 0} đơn hàng
-            </span>
-            <button
-              className="pagination-btn"
-              onClick={() => fetchOrders(currentPage + 1)}
-              disabled={currentPage >= (allOrders?.totalPages || 1)}
-            >
-              Trang sau →
-            </button>
+            <Pagination totalPages={allOrders?.docs?.totalPages} />
           </div>
         </div>
       )}
