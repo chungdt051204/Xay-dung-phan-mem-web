@@ -6,6 +6,8 @@ import Footer from "../components/Footer";
 import ProductCategoryCard from "../components/ProductCategoryCard";
 import Banner from "../components/Banner";
 import User from "./User";
+import { api } from "../../App";
+import fetchApi from "../../service/api";
 
 export default function HomeUser() {
   const { products } = useContext(AppContext);
@@ -41,25 +43,14 @@ export default function HomeUser() {
   useEffect(() => {
     const searchQuery = searchParams.get("search");
     if (searchQuery) {
-      const filtered = products?.docs?.filter(
-        (product) =>
-          product.productName
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          (product.description &&
-            product.description
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase())) ||
-          (product.techSpecs &&
-            product.techSpecs
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase())),
-      );
-      setFilteredProducts(filtered || []);
+      fetchApi({
+        url: `${api}/product?productName=${encodeURIComponent(searchQuery)}`,
+        setData: setFilteredProducts,
+      });
     } else {
       setFilteredProducts([]);
     }
-  }, [searchParams, products]);
+  }, [searchParams]);
 
   const phones = products?.docs?.filter(
     (value) => value.categoryId.categoryName === "Điện thoại",
@@ -87,10 +78,10 @@ export default function HomeUser() {
           <Banner />
           <div style={{ padding: "20px" }}>
             <h2>Kết quả tìm kiếm cho: "{searchParams.get("search")}"</h2>
-            {filteredProducts.length === 0 ? (
+            {filteredProducts?.docs?.length === 0 ? (
               <p>Không tìm thấy sản phẩm phù hợp</p>
             ) : (
-              <ProductCategoryCard data={filteredProducts} />
+              <ProductCategoryCard data={filteredProducts?.docs} />
             )}
           </div>
         </>

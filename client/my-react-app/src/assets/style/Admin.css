@@ -5,6 +5,28 @@
   font-family: "Inter", sans-serif;
 }
 
+/* Scrollbar styling */
+.admin-sidebar::-webkit-scrollbar,
+.admin-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track,
+.admin-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb,
+.admin-nav::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb:hover,
+.admin-nav::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
 .admin-sidebar {
   width: 280px;
   background: #ffffff;
@@ -16,6 +38,7 @@
   padding: 30px 20px;
   border-right: 1px solid #f3f4f6;
   z-index: 100;
+  overflow-y: auto;
 }
 
 .admin-logo-section {
@@ -71,7 +94,8 @@
 .admin-nav {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .admin-nav a {
@@ -124,6 +148,36 @@
 .back-to-home:hover {
   background: #f9fafb !important;
   color: #111827 !important;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 18px;
+  background: none;
+  border: none;
+  text-decoration: none;
+  color: #6b7280;
+  font-weight: 600;
+  border-radius: 12px;
+  margin-top: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  width: 100%;
+  text-align: left;
+}
+
+.logout-btn i {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.logout-btn:hover {
+  background: #fef2f2;
+  color: #ef4444;
 }
 
 .admin-main {

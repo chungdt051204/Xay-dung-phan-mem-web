@@ -1,13 +1,14 @@
 import { useContext, useEffect } from "react";
 import AppContext from "../components/AppContext";
 import { Outlet, useNavigate, Link } from "react-router-dom";
-
+import { toast } from "react-toastify";
 import logo from "../../assets/Logo.png";
 import "../style/Admin.css";
 
 export default function HomeAdmin() {
   const navigate = useNavigate();
-  const { isLoading, isLogin, isAdmin, me } = useContext(AppContext);
+  const { isLoading, isLogin, isAdmin, me, setIsLogin, setRefresh } =
+    useContext(AppContext);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -21,6 +22,14 @@ export default function HomeAdmin() {
       }
     }
   }, [isLoading, isLogin, me, navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLogin(false);
+    toast.success("Đăng xuất thành công");
+    setRefresh((prev) => prev + 1);
+    navigate("/");
+  };
 
   return (
     <div className="admin-wrapper">
@@ -82,6 +91,14 @@ export default function HomeAdmin() {
               <i className="fa-solid fa-house"></i>
               <span>Về trang chủ</span>
             </Link>
+            <button
+              onClick={handleLogout}
+              className="logout-btn"
+              title="Đăng xuất khỏi tài khoản admin"
+            >
+              <i className="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>Đăng xuất</span>
+            </button>
           </div>
         </nav>
       </aside>

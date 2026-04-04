@@ -4,6 +4,8 @@ import "../style/Navbar.css";
 import logo from "../../assets/Logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { api } from "../../App";
+import fetchApi from "../../service/api";
 
 export default function UserNavbar() {
   const navigate = useNavigate();
@@ -48,15 +50,24 @@ export default function UserNavbar() {
     const value = e.target.value;
     setSearchInput(value);
 
-    if (value.trim().length > 0 && products?.docs) {
-      const filtered = products.docs.filter(
-        (product) =>
-          product.productName.toLowerCase().includes(value.toLowerCase()) ||
-          (product.description &&
-            product.description.toLowerCase().includes(value.toLowerCase())),
-      );
-      setSuggestions(filtered?.slice(0, 8) || []);
-      setShowSuggestions(true);
+    if (value.trim().length > 0) {
+      // Fetch suggestions from backend instead of client-side filtering
+      const params = new URLSearchParams();
+      params.append("productName", value);
+      params.append("_limit", 8);
+
+      fetchApi({
+        url: `${api}/product?${params.toString()}`,
+        setData: (data) => {
+          if (data?.docs && data.docs.length > 0) {
+            setSuggestions(data.docs);
+            setShowSuggestions(true);
+          } else {
+            setSuggestions([]);
+            setShowSuggestions(false);
+          }
+        },
+      });
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
@@ -143,7 +154,12 @@ export default function UserNavbar() {
 
       <div className="navbar-search" ref={searchRef}>
         <form onSubmit={handleSearch}>
-          <i className="fa-solid fa-magnifying-glass"></i>
+          <i
+            className="fa-solid fa-magnifying-glass"
+            onClick={handleSearch}
+            style={{ cursor: "pointer" }}
+            title="Tìm kiếm"
+          ></i>
           <input
             className="search"
             type="text"
