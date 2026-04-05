@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import fetchApi from "../../service/api";
 import { api } from "../../App";
 import ConfirmDialog from "../components/ConfirmDialog";
+import "../style/BrandManager.css";
 
 export default function BrandManager() {
   const { brands, setRefresh } = useContext(AppContext);
@@ -142,6 +143,7 @@ export default function BrandManager() {
     <div className="page-box">
       <h2>Quản lý thương hiệu</h2>
       <button
+        className="btn-add"
         onClick={() => {
           formDialog.current.showModal();
         }}
@@ -159,6 +161,7 @@ export default function BrandManager() {
             required
           />
           <button
+            className="btn-cancel"
             type="button"
             onClick={() => {
               setSearchParams((prev) => {
@@ -171,7 +174,7 @@ export default function BrandManager() {
           >
             Hủy
           </button>
-          <button>Lưu</button>
+          <button className="btn-save">Lưu</button>
         </form>
       </dialog>
 
@@ -187,10 +190,18 @@ export default function BrandManager() {
             <tr key={brand._id}>
               <td>{brand.brandName}</td>
               <td>
-                <button onClick={() => handleOpenConfirmDialog(brand._id)}>
+                <button
+                  className="btn-delete"
+                  onClick={() => handleOpenConfirmDialog(brand._id)}
+                >
                   Xóa
                 </button>
-                <button onClick={() => handleOpenDialog(brand._id)}>Sửa</button>
+                <button
+                  className="btn-edit"
+                  onClick={() => handleOpenDialog(brand._id)}
+                >
+                  Sửa
+                </button>
               </td>
             </tr>
           ))}

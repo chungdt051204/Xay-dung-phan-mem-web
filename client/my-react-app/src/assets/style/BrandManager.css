@@ -1,0 +1,31 @@
+/* Nút Xóa — đỏ */
+.btn-delete,
+tbody td button:first-child {
+  background: #df3346;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  cursor: pointer;
+  transition: background 0.13s, transform 0.12s;
+}
+tbody td button:first-child:hover { background: #b91c2e; transform: translateY(-1px); }
+
+/* Nút Sửa — xanh dương */
+.btn-edit,
+tbody td button:last-child {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  cursor: pointer;
+  transition: background 0.13s, transform 0.12s;
+}
+tbody td button:last-child:hover { background: #1d4ed8; transform: translateY(-1px); }
