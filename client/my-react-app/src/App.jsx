@@ -1,37 +1,31 @@
 import { Routes, Route, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
-import AppContext from "./assets/components/AppContext";
-import HomeUser from "./assets/pages/HomeUser";
-import Login from "./assets/pages/Login";
-import Register from "./assets/pages/Register";
-import HomeAdmin from "./assets/pages/HomeAdmin";
-import BrandManager from "./assets/pages/BrandManager";
-import CategoryManager from "./assets/pages/CategoryManager";
-import ProductManager from "./assets/pages/ProductManager";
-import UserManager from "./assets/pages/UserManager";
-import OrderManager from "./assets/pages/OrderManager";
-import Password from "./assets/pages/Password";
-import Confirm from "./assets/pages/Confirm";
-import DetailProduct from "./assets/pages/DetailProduct";
-import Cart from "./assets/pages/Cart"; // cart page/component
+import AppContext from "./components/AppContext";
 import fetchApi from "./service/api";
-import AccessDeniedPage from "./assets/pages/AccessDeniedPage";
-import MyOrder from "./assets/pages/MyOrder";
-import MyOrderDetail from "./assets/pages/MyOrderDetail";
-import About from "./assets/pages/About";
-import Blogs from "./assets/pages/Blogs";
-import Contact from "./assets/pages/Contact";
-import FAQ from "./assets/pages/FAQ";
-import Account from "./assets/pages/Account";
-import Checkout from "./assets/pages/Checkout";
-
-import User from "./assets/pages/User";
-import ChatBot from "./assets/components/ChatBot";
-import MyProfile from "./assets/pages/MyProfile";
-import Dashboard from "./assets/pages/Dashboard";
-
 export const api = "http://localhost:3000";
+
+import HomeUser from "./pages/HomeUser";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Password from "./pages/Password";
+import Confirm from "./pages/Confirm";
+import DetailProduct from "./pages/DetailProduct";
+import Cart from "./pages/Cart";
+import User from "./pages/User";
+import ChatBot from "./components/ChatBot";
+import MyProfile from "./pages/MyProfile";
+import MyOrder from "./pages/MyOrder";
+import MyOrderDetail from "./pages/MyOrderDetail";
+import AccessDeniedPage from "./pages/AccessDeniedPage";
+
+import HomeAdmin from "./pages/HomeAdmin";
+import Dashboard from "./pages/Dashboard";
+import BrandManager from "./pages/BrandManager";
+import CategoryManager from "./pages/CategoryManager";
+import ProductManager from "./pages/ProductManager";
+import UserManager from "./pages/UserManager";
+import OrderManager from "./pages/OrderManager";
 
 function App() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -138,15 +132,7 @@ function App() {
         <Route path="/my-orders" element={<MyOrder />} />
         <Route path="/my-orders/detail" element={<MyOrderDetail />} />
         <Route path="/access-denied" element={<AccessDeniedPage />} />
-        {/* Quick Links & Account Routes */}
-        <Route path="/about" element={<About />} />
-        <Route path="/blogs" element={<Blogs />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/checkout" element={<Checkout />} />
 
-        {/* Routes cho phía Admin  */}
         <Route path="/admin" element={<HomeAdmin />}>
           <Route path="" element={<Dashboard />} />
           <Route path="brands" element={<BrandManager />} />
