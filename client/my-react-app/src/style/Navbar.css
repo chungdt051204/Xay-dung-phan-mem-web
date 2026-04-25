@@ -266,3 +266,75 @@
 .search-suggestions::-webkit-scrollbar-thumb:hover {
   background: #999;
 }
+/* --- RESPONSIVE CHO TABLET & MOBILE --- */
+
+@media (max-width: 1024px) {
+  .navbar {
+    padding-left: 15px;
+    padding-right: 15px;
+    height: auto;
+    min-height: 64px;
+    flex-wrap: wrap;
+    padding-bottom: 10px;
+    /* Đảm bảo không bị tràn bề ngang */
+    overflow-x: hidden;
+  }
+
+  /* Thu nhỏ thanh search và sửa lỗi tràn */
+  .navbar-search {
+    position: relative;
+    left: 0;
+    top: 0;
+    transform: none;
+    order: 3;
+    /* Dùng calc để trừ đi khoảng trống nếu cần, hoặc đảm bảo margin = 0 */
+    width: 100%;
+    margin: 10px 0 0 0;
+    height: 38px;
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar-search form {
+    width: 100%;
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-logo {
+    height: 32px; /* Thu nhỏ logo */
+  }
+
+  .navbar-category {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  .navbar-category span {
+    display: none; /* Ẩn chữ "Danh mục" trên mobile, chỉ để icon */
+  }
+
+  .navbar-search {
+    width: 100%;
+    height: 34px;
+  }
+
+  .search-suggestions {
+    position: fixed; /* Hiển thị gợi ý tràn màn hình trên mobile cho dễ nhìn */
+    top: 110px;
+    left: 10px;
+    right: 10px;
+    width: calc(100% - 20px);
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-right {
+    gap: 8px;
+  }
+
+  .login {
+    padding: 6px 8px;
+  }
+}

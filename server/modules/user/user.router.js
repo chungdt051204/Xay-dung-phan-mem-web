@@ -40,11 +40,17 @@ router.put(
   upload.single("avatar"),
   userController.putMe
 );
-router.get(`${prefix}/user`, userController.getUser);
-router.put(
-  `${prefix}/admin/user`,
+router.get(`${prefix}/user`, verifyToken, verifyAdmin, userController.getUser);
+router.get(
+  `${prefix}/user/:id`,
   verifyToken,
   verifyAdmin,
-  userController.putStatus
+  userController.getUserById
+);
+router.put(
+  `${prefix}/user/:id`,
+  verifyToken,
+  verifyAdmin,
+  userController.updateStatus
 );
 module.exports = router;

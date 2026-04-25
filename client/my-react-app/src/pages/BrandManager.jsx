@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useContext, useEffect, useRef, useState } from "react";
 import AppContext from "../components/AppContext";
 import { toast } from "react-toastify";
@@ -35,7 +36,7 @@ export default function BrandManager() {
     if (id) {
       setIsEdit(true);
       fetchApi({
-        url: `${api}/brand?id=${id}`,
+        url: `${api}/brand/${id}`,
         setData: setBrandWithId,
       });
     } else {
@@ -58,7 +59,7 @@ export default function BrandManager() {
   };
   const handleOpenConfirmDialog = (id) => {
     fetchApi({
-      url: `${api}/brand?id=${id}`,
+      url: `${api}/brand/${id}`,
       setData: setBrandWithId,
     });
     confirmDialog.current.showModal();
@@ -69,13 +70,13 @@ export default function BrandManager() {
       toast.error("Vui nhập tên thương hiệu");
       return;
     }
-    fetch(`${api}/brand`, {
+    fetch(`${api}/brand/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.token}`,
       },
-      body: JSON.stringify({ id: id, brandName: brandName }),
+      body: JSON.stringify({ brandName: brandName }),
     })
       .then((res) => {
         if (res.ok) return res.json();

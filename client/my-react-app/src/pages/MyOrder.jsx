@@ -59,7 +59,7 @@ export default function MyOrder() {
       const params = new URLSearchParams();
       if (page) params.append("_page", page);
       fetchApi({
-        url: `${api}/order?userId=${me?._id}&${params.toString()}&_limit=5`,
+        url: `${api}/user/order?${params.toString()}&_limit=5`,
         setData: setMyOrders,
       });
     }

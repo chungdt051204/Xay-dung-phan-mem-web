@@ -1,13 +1,13 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useNavigate } from "react-router-dom";
 import { useState, useContext, useEffect, useRef } from "react";
 import AppContext from "../components/AppContext";
-import React from "react";
 import Navbar from "../components/UserNavbar";
 import Footer from "../components/Footer";
-import "../style/Cart.css";
 import fetchApi from "../service/api";
 import { api } from "../App";
 import { toast } from "react-toastify";
+import "../style/Cart.css";
 import "../style/PaymentDialog.css";
 
 export default function Cart() {
@@ -17,12 +17,19 @@ export default function Cart() {
   const [myCart, setMyCart] = useState(null);
   const [itemIdsSelected, setItemIdsSelected] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [formData, setFormData] = useState({
+    fullname: "",
+    address: "",
+    phone: "",
+    paymentMethod: "cod",
+  });
   const [fullname, setFullname] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const formDialog = useRef();
 
+  //Hàm tính tổng tiền
   const totalAmount = () => {
     let sum = 0;
     myCart?.items?.length > 0 &&
@@ -32,14 +39,16 @@ export default function Cart() {
       });
     return sum;
   };
+
   const totalAmountSelectedItems = () => {
     let sum = 0;
     selectedItems?.forEach((value) => {
       sum = sum + value.productId.price * value.quantity;
     });
-    return sum + " " + "VNĐ";
+    return sum;
   };
 
+  //Kiểm tra quyền, nếu chưa login thì chuyển hướng về trang chủ
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -54,42 +63,53 @@ export default function Cart() {
     }
   }, [isLoading, isLogin, navigate]);
 
+  //Lấy dữ liệu giỏ hàng
   useEffect(() => {
     if (me) {
       fetchApi({ url: `${api}/cart`, setData: setMyCart });
     }
   }, [me, refresh]);
 
+  //Hàm lưu danh sách các item được chọn
   useEffect(() => {
     setSelectedItems(
       myCart?.items.filter((value) => itemIdsSelected.includes(value._id)) || []
     );
   }, [itemIdsSelected, myCart]);
 
+  //Hàm chọn/bỏ chọn các item khi tích/bỏ tích checkbox
   const handleItemSelected = (id) => {
+    //Nếu trong mảng item id chưa có id của item này thì thêm vào (tích chọn checkbox)
     if (!itemIdsSelected.includes(id))
       setItemIdsSelected((prev) => [...prev, id]);
+    //Ngược lại nếu có item id này rồi thì lọc mảng để loại bỏ item đó ra (bỏ tích checkbox)
     else {
       const newItemIds = itemIdsSelected?.filter((item) => item !== id);
       setItemIdsSelected(newItemIds);
     }
   };
+
+  //Hàm tích/bỏ tích tất cả item trong giỏ hàng
   const handleSelectedAll = () => {
+    //Nếu mảng item id chưa có phần tử (chưa có checkbox nào được tích), thì set giá trị cho mảng item id bằng id của tất cả item trong giỏ hàng
+    //Tất cả checkbox đều được tích
     if (itemIdsSelected.length === 0) {
       myCart?.items?.map((value) => {
         setItemIdsSelected((prev) => [...prev, value._id]);
       });
+      //Ngược lại set item id về mảng rỗng (Bỏ tích tất cả checkbox)
     } else setItemIdsSelected([]);
   };
+
+  //Hàm giảm số lượng sản phẩm trong giỏ hàng
   const handleDecreaseQuantity = (item) => {
+    //Nếu số lượng item > 1 thì mới làm
     if (item.quantity > 1) {
-      fetch(`${api}/cart?userId=${me?._id}&action=decrease`, {
+      fetch(`${api}/cart/${item._id}?action=decrease`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ itemId: item._id }),
       })
         .then((res) => {
           if (res.ok) return res.json();
@@ -105,22 +125,21 @@ export default function Cart() {
         });
     }
   };
+
+  //Hàm tăng số lượng sản phẩm trong giỏ hàng
   const handleIncreaseQuantity = (item) => {
-    // Kiểm tra số lượng tồn kho
+    // Kiểm tra số lượng tồn kho, nếu còn hàng thì mới được tăng tiếp
     if (item.quantity >= item.productId.quantityStock) {
       toast.warning(
         `Sản phẩm "${item.productId.productName}" chỉ còn ${item.productId.quantityStock} cái`
       );
       return;
     }
-
-    fetch(`${api}/cart?userId=${me?._id}&action=increase`, {
+    fetch(`${api}/cart/${item._id}?action=increase`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ itemId: item._id }),
     })
       .then((res) => {
         if (res.ok) return res.json();
@@ -135,8 +154,10 @@ export default function Cart() {
         console.log(message);
       });
   };
+
+  //Hàm xóa 1 item ra khỏi giỏ hàng
   const handleDelete = (id) => {
-    fetch(`${api}/cart?itemId=${id}`, {
+    fetch(`${api}/cart/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -155,7 +176,10 @@ export default function Cart() {
         console.log(message);
       });
   };
+
+  //Hàm xóa các item được chọn ra khỏi giỏ hàng
   const handleDeleteAll = () => {
+    //Phải có ít nhất 1 item được chọn thì mới làm
     if (itemIdsSelected.length > 0) {
       fetch(`${api}/cart`, {
         method: "DELETE",
@@ -179,6 +203,8 @@ export default function Cart() {
         });
     }
   };
+
+  //Hàm mở form Dialog xác nhận thanh toán
   const handleOpenDialog = () => {
     if (itemIdsSelected.length === 0) {
       toast.warning("Vui lòng chọn sản phẩm để xác nhận thanh toán");
@@ -186,6 +212,8 @@ export default function Cart() {
     }
     formDialog.current.showModal();
   };
+
+  //Hàm xử lý đặt hàng/thanh toán
   const handleConfirmOrder = (e) => {
     e.preventDefault();
     fetch(`${api}/order`, {
@@ -208,11 +236,13 @@ export default function Cart() {
         throw res;
       })
       .then(({ message, url }) => {
+        //Nếu thanh toán online bấm đặt hàng xong thông báo kết quả và đóng form Dialog luôn
         if (paymentMethod === "cod") {
           toast.success(message);
           formDialog.current.close();
           setRefresh((prev) => prev + 1);
         }
+        //Nếu thanh toán online thì chuyển hướng đến trang thanh toán online
         if (paymentMethod === "online") {
           console.log(url);
           window.location.href = url;
@@ -230,20 +260,18 @@ export default function Cart() {
   return (
     <>
       <Navbar />
-
       <div className="cart-page">
-        <header className="cart-header">
+        <div className="cart-header">
           <button className="back-btn" onClick={() => navigate(-1)}>
             <i className="fa-solid fa-arrow-left"></i>
           </button>
           <h1>Giỏ hàng của bạn</h1>
-        </header>
-
+        </div>
         <div className="cart-content">
           <ul className="cart-items">
             {myCart?.items.length > 0 ? (
               myCart?.items.map((item) => (
-                <li key={item._id} className="cart-item">
+                <li key={item._id} className="item">
                   <input
                     checked={itemIdsSelected.includes(item._id)}
                     onChange={() => handleItemSelected(item._id)}
@@ -255,7 +283,7 @@ export default function Cart() {
                     <p className="item-price">
                       {item.productId.price.toLocaleString()}đ
                     </p>
-                    <p className="item-desc">{item.productId.description}</p>
+                    <p className="item-des">{item.productId.description}</p>
                     <p className="item-tech">{item.productId.techSpecs}</p>
                     <div className="quantity-control">
                       <button onClick={() => handleDecreaseQuantity(item)}>
@@ -304,7 +332,6 @@ export default function Cart() {
                   Xóa
                 </button>
               </div>
-
               <h4>Tổng tiền: {totalAmount() + " " + "VNĐ"} </h4>
               <button onClick={handleOpenDialog} className="checkout-btn">
                 Thanh toán
@@ -328,7 +355,6 @@ export default function Cart() {
             ✕
           </button>
         </div>
-
         <form
           className="payment-form"
           method="dialog"
@@ -385,10 +411,8 @@ export default function Cart() {
                 </table>
               </div>
             </div>
-
             <div className="form-section">
               <div className="form-section-title">Thông tin giao hàng</div>
-
               <div className="form-group">
                 <label htmlFor="fullname">
                   Họ và tên <span className="required">*</span>
@@ -402,7 +426,6 @@ export default function Cart() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="address">
                   Địa chỉ giao hàng <span className="required">*</span>
@@ -416,7 +439,6 @@ export default function Cart() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="phone">
                   Số điện thoại <span className="required">*</span>
@@ -430,7 +452,6 @@ export default function Cart() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label>
                   Phương thức thanh toán <span className="required">*</span>
@@ -460,23 +481,17 @@ export default function Cart() {
                 </div>
               </div>
             </div>
-
             <div className="order-summary">
               <div className="summary-row">
                 <span>Tạm tính ({selectedItems.length} sản phẩm)</span>
                 <span className="amount">{totalAmountSelectedItems()}</span>
               </div>
-              {/* <div className="summary-row">
-                <span>Phí vận chuyển</span>
-                <span className="free-ship">Miễn phí</span>
-              </div> */}
               <div className="summary-row total">
                 <span>Tổng thanh toán</span>
                 <span className="amount">{totalAmountSelectedItems()}</span>
               </div>
             </div>
           </div>
-
           <div className="dialog-actions">
             <div className="action-btns">
               <button

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useContext, useEffect, useRef, useState } from "react";
 import AppContext from "../components/AppContext";
@@ -22,7 +23,7 @@ export default function CategoryManager() {
     if (id) {
       setIsEdit(true);
       fetchApi({
-        url: `${api}/category?id=${id}`,
+        url: `${api}/category/${id}`,
         setData: setCategoryWithId,
       });
     } else {
@@ -45,7 +46,7 @@ export default function CategoryManager() {
   };
   const handleOpenConfirmDialog = (id) => {
     fetchApi({
-      url: `${api}/category?id=${id}`,
+      url: `${api}/category/${id}`,
       setData: setCategoryWithId,
     });
     confirmDialog.current.showModal();
@@ -56,13 +57,13 @@ export default function CategoryManager() {
       toast.error("Vui lòng nhập tên danh mục");
       return;
     }
-    fetch(`${api}/category`, {
+    fetch(`${api}/category/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.token}`,
       },
-      body: JSON.stringify({ id: id, categoryName: categoryName }),
+      body: JSON.stringify({ categoryName: categoryName }),
     })
       .then((res) => {
         if (res.ok) return res.json();

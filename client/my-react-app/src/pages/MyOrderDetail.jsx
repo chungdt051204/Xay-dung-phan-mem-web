@@ -10,7 +10,7 @@ export default function MyOrderDetail() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const orderId = searchParams.get("orderId");
-  const { isLoading, isLogin, refresh, setRefresh } = useContext(AppContext);
+  const { isLoading, isLogin, setRefresh } = useContext(AppContext);
   const [myOrderDetail, setMyOrderDetail] = useState(null);
 
   const handleCancelOrder = async () => {
@@ -59,7 +59,7 @@ export default function MyOrderDetail() {
   useEffect(() => {
     if (orderId) {
       fetchApi({
-        url: `${api}/order?orderId=${orderId}`,
+        url: `${api}/order/${orderId}`,
         setData: setMyOrderDetail,
       });
     }

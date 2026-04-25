@@ -10,24 +10,9 @@ const end = dayjs().endOf("day").toDate();
 // 1. Lấy danh sách đơn hàng (Phân trang + Lọc)
 exports.getOrder = async (req, res) => {
   try {
-    const {
-      _page = 1,
-      _limit = 10,
-      orderId,
-      userId,
-      status,
-      paymentStatus,
-    } = req.query;
-
-    if (orderId) {
-      const order = await orderEntity
-        .findById(orderId)
-        .populate("items.productId");
-      return res.status(200).json({ result: order });
-    }
+    const { _page = 1, _limit = 10, status, paymentStatus } = req.query;
 
     let query = {};
-    if (userId) query.userId = userId;
     if (status) query.status = status;
     if (paymentStatus) query.paymentStatus = paymentStatus;
 
@@ -41,6 +26,40 @@ exports.getOrder = async (req, res) => {
     return res.status(200).json({ result: orders });
   } catch (error) {
     return res.status(500).json({ message: "Lấy danh sách đơn hàng thất bại" });
+  }
+};
+exports.getOrderById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await orderEntity.findById(id).populate("items.productId");
+    if (!order)
+      return res.status(404).json({ message: "Không tìm thấy đơn hàng này" });
+    return res.status(200).json({ result: order });
+  } catch (error) {
+    return res.status(500).json({ message: "Lấy thông tin đơn hàng thất bại" });
+  }
+};
+exports.getUserOrder = async (req, res) => {
+  try {
+    const payload = req.payload;
+    if (payload) {
+      const userId = payload.sub;
+      const { _page = 1, _limit = 10 } = req.query;
+      const option = {
+        page: _page,
+        limit: _limit,
+        sort: { createdAt: -1 },
+      };
+      const orders = await orderEntity.paginate({ userId }, option);
+      return res.status(200).json({ result: orders });
+    }
+    return res
+      .status(404)
+      .json({ message: "Không tìm thấy đơn hàng của người dùng" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Lấy danh sách đơn hàng của người dùng thất bại" });
   }
 };
 
@@ -203,7 +222,7 @@ exports.getMomoCallback = async (req, res) => {
 // 4. Cập nhật trạng thái đơn hàng (Tối ưu logic tự động)
 exports.updateOrderStatus = async (req, res) => {
   try {
-    const { id } = req.query;
+    const { id } = req.params;
     const { status, paymentStatus, note } = req.body;
 
     const order = await orderEntity.findById(id);
@@ -262,7 +281,7 @@ exports.updateOrderStatus = async (req, res) => {
 // 5. Hủy đơn hàng (Chỉ dành cho User)
 exports.cancelOrder = async (req, res) => {
   try {
-    const { id } = req.query;
+    const { id } = req.params;
     const order = await orderEntity.findById(id);
 
     if (!order || order.status === "Đã giao" || order.status === "Đang giao") {
@@ -275,27 +294,5 @@ exports.cancelOrder = async (req, res) => {
     return res.status(200).json({ message: "Đã hủy đơn hàng thành công" });
   } catch (error) {
     return res.status(500).json({ message: "Hủy đơn hàng thất bại" });
-  }
-};
-
-// 6. Lấy đơn hàng theo User
-exports.getUserOrders = async (req, res) => {
-  try {
-    const { userId } = req.query;
-    const orders = await orderEntity.find({ userId }).sort({ createdAt: -1 });
-    return res.status(200).json({ result: orders });
-  } catch (error) {
-    return res.status(500).json({ message: "Lấy đơn hàng thất bại" });
-  }
-};
-
-// 7. Xóa đơn hàng (Admin)
-exports.deleteOrder = async (req, res) => {
-  try {
-    const { id } = req.query;
-    await orderEntity.findByIdAndDelete(id);
-    return res.status(200).json({ message: "Xóa đơn hàng thành công" });
-  } catch (error) {
-    return res.status(500).json({ message: "Xóa đơn hàng thất bại" });
   }
 };

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useContext, useEffect, useRef, useState } from "react";
 import AppContext from "../components/AppContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -46,7 +47,7 @@ export default function UserManager() {
   useEffect(() => {
     if (id) {
       fetchApi({
-        url: `${api}/user?id=${id}`,
+        url: `${api}/user/${id}`,
         setData: setUserWithId,
       });
     } else {
@@ -98,14 +99,14 @@ export default function UserManager() {
   };
   const handleOpenConfirmDialog = (id) => {
     fetchApi({
-      url: `${api}/user?id=${id}`,
+      url: `${api}/user/${id}`,
       setData: setUserWithId,
     });
     confirmDialog.current.showModal();
   };
   const handleChangeStatus = () => {
     const status = userWithId?.status === "active" ? "inactive" : "active";
-    fetch(`${api}/admin/user?id=${userWithId._id}`, {
+    fetch(`${api}/user/${userWithId._id}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,

@@ -9,7 +9,7 @@ import "../style/DetailProduct.css";
 import { toast } from "react-toastify";
 
 export default function DetailProduct() {
-  const { isLogin, me, refresh, setRefresh } = useContext(AppContext);
+  const { isLogin, setRefresh } = useContext(AppContext);
   const [searchParams] = useSearchParams();
   const productId = searchParams.get("productId");
 
@@ -20,7 +20,7 @@ export default function DetailProduct() {
     if (!productId) return;
 
     fetchApi({
-      url: `${api}/product?productId=${productId}`,
+      url: `${api}/product/${productId}`,
       setData: setData,
     });
   }, [productId]);
@@ -42,7 +42,6 @@ export default function DetailProduct() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        userId: me?._id,
         productId: data?._id,
         quantity: quantity,
       }),

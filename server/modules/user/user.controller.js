@@ -129,16 +129,6 @@ exports.postRegister = async (req, res) => {
       return res.status(400).json({ message: "Mật khẩu không trùng khớp" });
     }
 
-    // // Kiểm tra số điện thoại đã tồn tại
-    // if (phone) {
-    //   const existingPhone = await userEntity.findOne({ phone });
-    //   if (existingPhone) {
-    //     return res
-    //       .status(409)
-    //       .json({ message: "Số điện thoại này đã được đăng ký" });
-    //   }
-    // }
-
     // Hash password
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -268,12 +258,9 @@ exports.putMe = async (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const arrayUser = await userEntity.find();
-    const { _page = 1, _limit = arrayUser?.length, role, id } = req.query;
+    const { _page = 1, _limit = arrayUser?.length, role } = req.query;
     let query = {};
-    if (id) {
-      const user = await userEntity.findOne({ _id: id });
-      return res.status(200).json({ result: user });
-    }
+
     if (role) query.roles = role;
     const options = {
       page: _page,
@@ -286,9 +273,22 @@ exports.getUser = async (req, res) => {
     return res.status(500).json({ message: "Lấy dũ liệu người dùng thất bại" });
   }
 };
-exports.putStatus = async (req, res) => {
+exports.getUserById = async (req, res) => {
   try {
-    const { id } = req.query;
+    const { id } = req.params;
+    const user = await userEntity.findById(id);
+    if (!user)
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
+    return res.status(200).json({ result: user });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Lấy thông tin người dùng thất bại" });
+  }
+};
+exports.updateStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
     const { status } = req.body;
     const result = await userEntity.updateOne({ _id: id }, { status });
     if (result.modifiedCount === 0)

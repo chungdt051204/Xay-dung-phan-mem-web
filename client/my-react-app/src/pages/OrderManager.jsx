@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState, useContext } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import AppContext from "../components/AppContext";
@@ -74,7 +75,7 @@ export default function OrderManager() {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${api}/order?id=${order._id}`, {
+      const response = await fetch(`${api}/order/${order._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -88,7 +89,7 @@ export default function OrderManager() {
       } else {
         alert("Cập nhật thất bại");
       }
-    } catch (error) {
+    } catch {
       alert("Lỗi kết nối server");
     }
   };
