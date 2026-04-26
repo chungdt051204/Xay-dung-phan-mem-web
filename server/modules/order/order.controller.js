@@ -64,7 +64,7 @@ exports.getUserOrder = async (req, res) => {
 };
 
 // 2. Tạo đơn hàng mới
-exports.postOrder = async (req, res) => {
+exports.createOrder = async (req, res) => {
   try {
     if (!req.payload)
       return res.status(401).json({ message: "Vui lòng đăng nhập" });

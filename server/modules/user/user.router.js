@@ -23,16 +23,16 @@ const upload = multer({
 router.post(
   `${prefix}/register`,
   upload.single("avatar"),
-  userController.postRegister
+  userController.Register
 );
-router.get(`${prefix}/auth/google`, userController.getLoginGoogle);
+router.get(`${prefix}/auth/google`, userController.loginGoogle);
 router.get(
   `${prefix}/auth/google/callback`,
   userController.getResultLoginGoogle
 );
-router.post(`${prefix}/login`, userController.postLogin);
-router.post(`${prefix}/reset`, userController.postReset);
-router.post(`${prefix}/confirm`, userController.postConfirm);
+router.post(`${prefix}/login`, userController.Login);
+router.post(`${prefix}/reset`, userController.resetPassword);
+router.post(`${prefix}/confirm`, userController.confirmEmail);
 router.get(`${prefix}/me`, verifyToken, userController.getMe);
 router.put(
   `${prefix}/me`,

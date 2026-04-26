@@ -7,10 +7,10 @@ const {
 } = require("../../service/middleware/authMiddleware");
 const prefix = "";
 
-router.get("/order", orderController.getOrder);
+router.get("/order", verifyToken, verifyAdmin, orderController.getOrder);
 router.get("/order/:id", orderController.getOrderById);
 router.get("/user/order", verifyToken, orderController.getUserOrder);
-router.post("/order", verifyToken, orderController.postOrder);
+router.post("/order", verifyToken, orderController.createOrder);
 router.get(`${prefix}/momo-callback`, orderController.getMomoCallback);
 router.put("/order/cancel", verifyToken, orderController.cancelOrder);
 router.put(

@@ -9,7 +9,7 @@ const saltRounds = 10;
 const jwtSecret = process.env.JWT_SECRET;
 
 //Hàm chuyển hướng đến trang đăng nhập google
-exports.getLoginGoogle = passport.authenticate("google", {
+exports.loginGoogle = passport.authenticate("google", {
   scope: ["profile", "email"], //Lấy giá trị profile và email
   prompt: "select_account", //Mỗi lần chuyển đến trang đăng nhập google, người dùng có thể chọn tài khoản khác
 });
@@ -45,7 +45,7 @@ exports.getResultLoginGoogle = [
     ); //Đăng nhập google thành công thì tạo jwt token và chuyển hướng về trang chủ đính kèm token vừa tạo
   },
 ];
-exports.postLogin = async (req, res) => {
+exports.Login = async (req, res) => {
   try {
     const { input, password } = req.body;
     console.log(req.body);
@@ -96,7 +96,7 @@ exports.postLogin = async (req, res) => {
       .json({ message: "Đăng nhập thất bại", error: error.message });
   }
 };
-exports.postRegister = async (req, res) => {
+exports.Register = async (req, res) => {
   try {
     const {
       fullname,
@@ -160,7 +160,7 @@ exports.postRegister = async (req, res) => {
       .json({ message: "Đăng ký thất bại", error: error.message });
   }
 };
-exports.postReset = async (req, res) => {
+exports.resetPassword = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await userEntity.findOne({
@@ -188,7 +188,7 @@ exports.postReset = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-exports.postConfirm = async (req, res) => {
+exports.confirmEmail = async (req, res) => {
   try {
     const inputCode = Number(req.body.input);
     console.log(req.body);
