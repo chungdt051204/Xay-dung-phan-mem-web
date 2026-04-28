@@ -42,15 +42,19 @@ exports.getOrderById = async (req, res) => {
 exports.getUserOrder = async (req, res) => {
   try {
     const payload = req.payload;
+    console.log(payload);
     if (payload) {
       const userId = payload.sub;
+      console.log(userId);
+      let query = {};
+      if (userId) query.userId = userId;
       const { _page = 1, _limit = 10 } = req.query;
       const option = {
         page: _page,
         limit: _limit,
         sort: { createdAt: -1 },
       };
-      const orders = await orderEntity.paginate({ userId }, option);
+      const orders = await orderEntity.paginate(query, option);
       return res.status(200).json({ result: orders });
     }
     return res
