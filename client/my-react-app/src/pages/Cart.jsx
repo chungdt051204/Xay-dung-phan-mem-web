@@ -23,7 +23,6 @@ export default function Cart() {
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const formDialog = useRef();
 
-  //Hàm tính tổng tiền
   const totalAmount = () => {
     let sum = 0;
     myCart?.items?.length > 0 &&
@@ -42,7 +41,6 @@ export default function Cart() {
     return sum;
   };
 
-  //Kiểm tra quyền, nếu chưa login thì chuyển hướng về trang chủ
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -57,72 +55,47 @@ export default function Cart() {
     }
   }, [isLoading, isLogin, navigate]);
 
-  //Lấy dữ liệu giỏ hàng
   useEffect(() => {
     if (me) {
       fetchApi({ url: `${api}/cart`, setData: setMyCart });
     }
   }, [me, refresh]);
 
-  //Hàm lưu danh sách các item được chọn
   useEffect(() => {
     setSelectedItems(
       myCart?.items.filter((value) => itemIdsSelected.includes(value._id)) || []
     );
   }, [itemIdsSelected, myCart]);
 
-  //Hàm chọn/bỏ chọn các item khi tích/bỏ tích checkbox
   const handleItemSelected = (id) => {
-    //Nếu trong mảng item id chưa có id của item này thì thêm vào (tích chọn checkbox)
     if (!itemIdsSelected.includes(id))
       setItemIdsSelected((prev) => [...prev, id]);
-    //Ngược lại nếu có item id này rồi thì lọc mảng để loại bỏ item đó ra (bỏ tích checkbox)
     else {
       const newItemIds = itemIdsSelected?.filter((item) => item !== id);
       setItemIdsSelected(newItemIds);
     }
   };
 
-  //Hàm tích/bỏ tích tất cả item trong giỏ hàng
   const handleSelectedAll = () => {
-    //Nếu mảng item id chưa có phần tử (chưa có checkbox nào được tích), thì set giá trị cho mảng item id bằng id của tất cả item trong giỏ hàng
-    //Tất cả checkbox đều được tích
     if (itemIdsSelected.length === 0) {
-      myCart?.items?.map((value) => {
-        setItemIdsSelected((prev) => [...prev, value._id]);
-      });
-      //Ngược lại set item id về mảng rỗng (Bỏ tích tất cả checkbox)
+      const allIds = myCart?.items?.map((value) => value._id);
+      setItemIdsSelected(allIds || []);
     } else setItemIdsSelected([]);
   };
 
-  //Hàm giảm số lượng sản phẩm trong giỏ hàng
   const handleDecreaseQuantity = (item) => {
-    //Nếu số lượng item > 1 thì mới làm
     if (item.quantity > 1) {
       fetch(`${api}/cart/${item._id}?action=decrease`, {
         method: "PUT",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
-        .then((res) => {
-          if (res.ok) return res.json();
-          throw res;
-        })
-        .then(({ message }) => {
-          console.log(message);
-          setRefresh((prev) => prev + 1);
-        })
-        .catch(async (err) => {
-          const { message } = await err.json();
-          console.log(message);
-        });
+        .then((res) => (res.ok ? res.json() : Promise.reject(res)))
+        .then(() => setRefresh((prev) => prev + 1))
+        .catch(() => {});
     }
   };
 
-  //Hàm tăng số lượng sản phẩm trong giỏ hàng
   const handleIncreaseQuantity = (item) => {
-    // Kiểm tra số lượng tồn kho, nếu còn hàng thì mới được tăng tiếp
     if (item.quantity >= item.productId.quantityStock) {
       toast.warning(
         `Sản phẩm "${item.productId.productName}" chỉ còn ${item.productId.quantityStock} cái`
@@ -131,49 +104,26 @@ export default function Cart() {
     }
     fetch(`${api}/cart/${item._id}?action=increase`, {
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
-      .then((res) => {
-        if (res.ok) return res.json();
-        throw res;
-      })
-      .then(({ message }) => {
-        console.log(message);
-        setRefresh((prev) => prev + 1);
-      })
-      .catch(async (err) => {
-        const { message } = await err.json();
-        console.log(message);
-      });
+      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
+      .then(() => setRefresh((prev) => prev + 1))
+      .catch(() => {});
   };
 
-  //Hàm xóa 1 item ra khỏi giỏ hàng
   const handleDelete = (id) => {
     fetch(`${api}/cart/${id}`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
-      .then((res) => {
-        if (res.ok) return res.json();
-        throw res;
-      })
+      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
       .then(({ message }) => {
         toast.success(message);
         setRefresh((prev) => prev + 1);
-      })
-      .catch(async (err) => {
-        const { message } = await err.json();
-        console.log(message);
       });
   };
 
-  //Hàm xóa các item được chọn ra khỏi giỏ hàng
   const handleDeleteAll = () => {
-    //Phải có ít nhất 1 item được chọn thì mới làm
     if (itemIdsSelected.length > 0) {
       fetch(`${api}/cart`, {
         method: "DELETE",
@@ -183,22 +133,14 @@ export default function Cart() {
         },
         body: JSON.stringify({ itemIds: itemIdsSelected }),
       })
-        .then((res) => {
-          if (res.ok) return res.json();
-          throw res;
-        })
+        .then((res) => (res.ok ? res.json() : Promise.reject(res)))
         .then(({ message }) => {
           toast.success(message);
           setRefresh((prev) => prev + 1);
-        })
-        .catch(async (err) => {
-          const { message } = await err.json();
-          console.log(message);
         });
     }
   };
 
-  //Hàm mở form Dialog xác nhận thanh toán
   const handleOpenDialog = () => {
     if (itemIdsSelected.length === 0) {
       toast.warning("Vui lòng chọn sản phẩm để xác nhận thanh toán");
@@ -207,9 +149,11 @@ export default function Cart() {
     formDialog.current.showModal();
   };
 
-  //Hàm xử lý đặt hàng/thanh toán
+  // 2. Hàm xử lý đặt hàng tối ưu hóa luồng redirect
   const handleConfirmOrder = (e) => {
     e.preventDefault();
+    const loadId = toast.loading("Đang khởi tạo đơn hàng...");
+
     fetch(`${api}/order`, {
       method: "POST",
       headers: {
@@ -217,40 +161,39 @@ export default function Cart() {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
-        fullname: fullname,
-        address: address,
-        phone: phone,
-        paymentMethod: paymentMethod,
+        fullname,
+        address,
+        phone,
+        paymentMethod,
         total: totalAmount(),
         items: selectedItems,
       }),
     })
-      .then((res) => {
-        if (res.ok) return res.json();
-        throw res;
-      })
+      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
       .then(({ message, url }) => {
-        //Nếu thanh toán online bấm đặt hàng xong thông báo kết quả và đóng form Dialog luôn
+        toast.dismiss(loadId);
         if (paymentMethod === "cod") {
           toast.success(message);
           formDialog.current.close();
           setRefresh((prev) => prev + 1);
         }
-        //Nếu thanh toán online thì chuyển hướng đến trang thanh toán online
-        if (paymentMethod === "online") {
-          console.log(url);
-          window.location.href = url;
+        // 3. Đối với thanh toán online: Thông báo rõ ràng trước khi chuyển hướng
+        if (paymentMethod === "online" && url) {
+          toast.info("Đang chuyển hướng đến cổng thanh toán an toàn...");
+          // Trì hoãn một chút để trình duyệt không coi đây là hành động pop-up độc hại
+          setTimeout(() => {
+            window.location.href = url;
+          }, 1000);
         }
       })
       .catch(async (err) => {
+        toast.dismiss(loadId);
         formDialog.current.close();
-        if (err.status === 404 || err.status === 400) {
-          const { message } = await err.json();
-          toast.error(message);
-        }
-        console.log("Lỗi hệ thống");
+        const errJson = await err.json().catch(() => ({}));
+        toast.error(errJson.message || "Lỗi hệ thống");
       });
   };
+
   return (
     <>
       <Navbar />
@@ -271,14 +214,13 @@ export default function Cart() {
                     onChange={() => handleItemSelected(item._id)}
                     type="checkbox"
                   />
-                  <img src={item.productId.image} />
+                  <img src={item.productId.image} alt="product" />
                   <div className="item-info">
                     <p className="item-name">{item.productId.productName}</p>
                     <p className="item-price">
                       {item.productId.price.toLocaleString()}đ
                     </p>
                     <p className="item-des">{item.productId.description}</p>
-                    <p className="item-tech">{item.productId.techSpecs}</p>
                     <div className="quantity-control">
                       <button onClick={() => handleDecreaseQuantity(item)}>
                         -
@@ -319,14 +261,14 @@ export default function Cart() {
                     }
                     onChange={handleSelectedAll}
                     type="checkbox"
-                  />
+                  />{" "}
                   Chọn tất cả
                 </div>
                 <button onClick={handleDeleteAll} className="checkout-btn">
                   Xóa
                 </button>
               </div>
-              <h4>Tổng tiền: {totalAmount() + " " + "VNĐ"} </h4>
+              <h4>Tổng tiền: {totalAmount().toLocaleString()} VNĐ</h4>
               <button onClick={handleOpenDialog} className="checkout-btn">
                 Thanh toán
               </button>
@@ -338,8 +280,7 @@ export default function Cart() {
       <dialog ref={formDialog} className="payment-dialog">
         <div className="dialog-header">
           <div className="dialog-header-text">
-            <span className="dialog-header-sub">Xác nhận đơn hàng</span>
-            <h2>Thanh toán</h2>
+            <h2>Xác nhận thanh toán</h2>
           </div>
           <button
             type="button"
@@ -372,19 +313,13 @@ export default function Cart() {
                       <tr key={value._id}>
                         <td>
                           <div className="product-cell">
-                            <img
-                              src={value.productId.image}
-                              alt={value.productId.productName}
-                            />
+                            <img src={value.productId.image} alt="product" />
                             <div>
                               <p className="product-name">
                                 {value.productId.productName}
                               </p>
                               <p className="product-desc">
                                 {value.productId.description}
-                              </p>
-                              <p className="product-desc">
-                                {value.productId.techSpecs}
                               </p>
                             </div>
                           </div>
@@ -408,41 +343,39 @@ export default function Cart() {
             <div className="form-section">
               <div className="form-section-title">Thông tin giao hàng</div>
               <div className="form-group">
-                <label htmlFor="fullname">
+                <label>
                   Họ và tên <span className="required">*</span>
                 </label>
                 <input
                   value={fullname}
-                  id="fullname"
                   type="text"
                   onChange={(e) => setFullname(e.target.value)}
-                  placeholder="Vui lòng nhập họ tên"
+                  placeholder="Nhập họ tên"
                   required
+                  autoComplete="off"
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="address">
+                <label>
                   Địa chỉ giao hàng <span className="required">*</span>
                 </label>
                 <input
                   value={address}
-                  id="address"
                   type="text"
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Vui lòng nhập địa chỉ"
+                  placeholder="Nhập địa chỉ"
                   required
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="phone">
+                <label>
                   Số điện thoại <span className="required">*</span>
                 </label>
                 <input
                   value={phone}
-                  id="phone"
                   type="tel"
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Vui lòng nhập số điện thoại"
+                  placeholder="Nhập số điện thoại"
                   required
                 />
               </div>
@@ -456,33 +389,32 @@ export default function Cart() {
                       type="radio"
                       name="paymentMethod"
                       value="cod"
-                      defaultChecked
+                      checked={paymentMethod === "cod"}
                       onChange={(e) => setPaymentMethod(e.target.value)}
                     />
-                    <span className="radio-icon">🚚</span>
-                    <span>Thanh toán khi nhận hàng</span>
+                    <span className="radio-icon">🚚</span>{" "}
+                    <span>Khi nhận hàng</span>
                   </label>
                   <label className="radio-label">
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="online"
+                      checked={paymentMethod === "online"}
                       onChange={(e) => setPaymentMethod(e.target.value)}
                     />
-                    <span className="radio-icon">💳</span>
-                    <span>Thanh toán trực tuyến</span>
+                    <span className="radio-icon">💳</span>{" "}
+                    <span>Trực tuyến (MoMo)</span>
                   </label>
                 </div>
               </div>
             </div>
             <div className="order-summary">
-              <div className="summary-row">
-                <span>Tạm tính ({selectedItems.length} sản phẩm)</span>
-                <span className="amount">{totalAmountSelectedItems()}</span>
-              </div>
               <div className="summary-row total">
                 <span>Tổng thanh toán</span>
-                <span className="amount">{totalAmountSelectedItems()}</span>
+                <span className="amount">
+                  {totalAmountSelectedItems().toLocaleString()}₫
+                </span>
               </div>
             </div>
           </div>
@@ -496,7 +428,7 @@ export default function Cart() {
                 Hủy
               </button>
               <button type="submit" className="submit-btn">
-                Đặt hàng ngay →
+                Xác nhận đặt hàng →
               </button>
             </div>
           </div>

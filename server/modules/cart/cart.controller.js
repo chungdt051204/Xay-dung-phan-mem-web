@@ -8,6 +8,15 @@ exports.getCart = async (req, res) => {
     const cart = await cartEntity
       .findOne({ userId })
       .populate("items.productId");
+
+    //Sắp xếp item theo giá tăng dần
+    if (cart && cart.items) {
+      cart.items.sort((a, b) => {
+        const priceA = a.productId ? a.productId.price : 0;
+        const priceB = b.productId ? b.productId.price : 0;
+        return priceA - priceB; // Tăng dần
+      });
+    }
     return res.status(200).json({ result: cart });
   } catch (error) {
     return res
@@ -129,7 +138,7 @@ exports.deleteCartItemSelected = async (req, res) => {
     if (result.modifiedCount === 0)
       return res.status(404).json({ message: "Không tìm thấy item để xóa" });
     return res.status(200).json({
-      message: `Đã xóa ${itemIds?.length} ra khỏi giỏ hàng thành công`,
+      message: `Đã xóa ${itemIds?.length} sản phẩm ra khỏi giỏ hàng thành công`,
     });
   } catch (error) {
     return res

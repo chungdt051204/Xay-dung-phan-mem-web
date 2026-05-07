@@ -70,9 +70,6 @@ exports.getUserOrder = async (req, res) => {
 // 2. Tạo đơn hàng mới
 exports.createOrder = async (req, res) => {
   try {
-    if (!req.payload)
-      return res.status(401).json({ message: "Vui lòng đăng nhập" });
-
     const userId = req.payload.sub;
     const { fullname, address, phone, paymentMethod, items, total } = req.body;
 
@@ -101,7 +98,6 @@ exports.createOrder = async (req, res) => {
         amount: item.productId.price * item.quantity,
       });
     }
-    console.log(arrayItems);
 
     const newOrder = await orderEntity.create({
       userId,
@@ -113,23 +109,22 @@ exports.createOrder = async (req, res) => {
       items: arrayItems,
     });
 
-    // Xóa item khỏi giỏ hàng
-    const itemIds = items.map((val) => val._id);
-    await cartEntity.updateOne(
-      { userId },
-      { $pull: { items: { _id: { $in: itemIds } } } }
-    );
-
     // Xử lý theo phương thức thanh toán
     if (paymentMethod === "cod") {
+      // Xóa item khỏi giỏ hàng
+      const itemIds = items.map((val) => val._id);
+      await cartEntity.updateOne(
+        { userId },
+        { $pull: { items: { _id: { $in: itemIds } } } }
+      );
       return res.status(200).json({ message: "Đặt hàng thành công" });
     }
 
     if (paymentMethod === "online") {
       // Logic MOMO (Giữ nguyên cấu hình của bạn)
       const partnerCode = "MOMO",
-        accessKey = "F8BBA842ECF85",
-        secretkey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
+        accessKey = process.env.ACCESS_KEY,
+        secretkey = process.env.SECRET_KEY;
       const requestId = partnerCode + new Date().getTime();
       const orderInfo = `Thanh toán đơn hàng ${newOrder._id}`;
       const redirectUrl = `${process.env.URL_BACKEND}/momo-callback`,
@@ -171,7 +166,8 @@ exports.createOrder = async (req, res) => {
 // 3. Momo Callback
 exports.getMomoCallback = async (req, res) => {
   try {
-    const { orderId, resultCode, message } = req.query;
+    const { orderId, resultCode } = req.query;
+    console.log(resultCode);
     if (resultCode == 0) {
       const order = await orderEntity.findOne({ _id: orderId });
       if (!order)
@@ -179,6 +175,11 @@ exports.getMomoCallback = async (req, res) => {
       await orderEntity.findByIdAndUpdate(orderId, {
         paymentStatus: "Đã thanh toán",
       });
+      const productIds = order.items.map((val) => val.productId);
+      await cartEntity.updateOne(
+        { userId: order.userId },
+        { $pull: { items: { productId: { $in: productIds } } } }
+      );
       await Promise.all(
         order?.items?.map(async (value) => {
           const item = await revenueEntity.findOne({
@@ -209,13 +210,9 @@ exports.getMomoCallback = async (req, res) => {
         })
       );
 
-      return res.redirect(
-        `${process.env.URL_FRONTEND}/cart?message=${message}`
-      );
+      return res.redirect(`${process.env.URL_FRONTEND}/cart?status=success`);
     }
-    return res
-      .status(400)
-      .json("Thanh toán thất bại", { error: error.message });
+    return res.redirect(`${process.env.URL_FRONTEND}/cart?status=error`);
   } catch (error) {
     return res
       .status(500)
