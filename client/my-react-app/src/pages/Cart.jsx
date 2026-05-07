@@ -17,12 +17,6 @@ export default function Cart() {
   const [myCart, setMyCart] = useState(null);
   const [itemIdsSelected, setItemIdsSelected] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [formData, setFormData] = useState({
-    fullname: "",
-    address: "",
-    phone: "",
-    paymentMethod: "cod",
-  });
   const [fullname, setFullname] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
